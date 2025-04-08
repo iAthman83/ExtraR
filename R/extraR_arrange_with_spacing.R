@@ -9,7 +9,7 @@
 #' @return A new data frame with with all operations performed.
 #' @export
 
-arrange_with_spacing <- function(df, col) {
+extraR_arrange_with_spacing <- function(df, col) {
   # Compute run-length encoding for the target column
   r <- rle(as.character(df[[col]]))
 
