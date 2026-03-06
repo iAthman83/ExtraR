@@ -1,17 +1,21 @@
-Package: ExtraR
-Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Authors@R: c(
-    person(
-      "Jane", "Doe",
-      email = "jane@example.com",
-      role = c("aut", "cre")
-    )
-  )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Package: extrar
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person("Abubakar", "Athman", , "athman.abu@example.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
 Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    cleaningtools,
+    analysistools,
+    presentresults,
+    addindicators
+Remotes: 
+    impact-initiatives/cleaningtools,
+    impact-initiatives/analysistools,
+    impact-initiatives/presentresults,
+    impact-initiatives/addindicators

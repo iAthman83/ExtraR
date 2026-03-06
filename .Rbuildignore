@@ -1,4 +1,4 @@
 ^renv$
 ^renv\.lock$
-^.*\.Rproj$
+^extrar\.Rproj$
 ^\.Rproj\.user$
