@@ -161,6 +161,10 @@ run_group_analysis_pipeline <- function(
     }
   }
 
+  if ("uuid" %in% names(combined_analysis)) {
+    combined_analysis$uuid <- NULL
+  }
+
   return(list(
     combined_results = combined_analysis,
     uuid_table = uuid_table

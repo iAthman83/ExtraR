@@ -19,10 +19,13 @@ insert_empty_rows <- function(df, col) {
     group_length <- r$lengths[i]
     group_rows <- df[idx:(idx + group_length - 1), ]
 
-    # Sort the group by the stat_overall column in descending order
-    group_rows <- group_rows[order(-group_rows$stat_overall), ]
+    # Sort the group by the stat_overall column in ascending order
+    if ("stat_overall" %in% names(group_rows)) {
+      group_rows <- group_rows[order(group_rows$stat_overall, na.last = TRUE), ]
+    }
 
     new_df <- rbind(new_df, group_rows)
+
     # Insert an empty row if this is not the last group
     if (i < length(r$lengths)) {
       # Create an empty row with NA values
@@ -36,6 +39,15 @@ insert_empty_rows <- function(df, col) {
     }
     idx <- idx + group_length
   }
+
+  # Insert an empty row after the absolute last group too
+  if (nrow(new_df) > 0) {
+    empty_row <- setNames(as.list(rep(NA, ncol(df))), names(df))
+    empty_row[[1]] <- new_df[nrow(new_df), 1]
+    empty_row[[2]] <- new_df[nrow(new_df), 2]
+    new_df <- rbind(new_df, empty_row)
+  }
+
   return(new_df)
 }
 
@@ -73,29 +85,31 @@ format_my_xlsx_variable_x_group <- function(
   insert_empty_rows = FALSE,
   empty_rows_col = "question"
 ) {
-  # Insert empty rows if requested and the input is a data frame
-  if (
-    insert_empty_rows &&
-      is.data.frame(table_group_x_variable) &&
-      empty_rows_col %in% names(table_group_x_variable)
-  ) {
-    table_group_x_variable <- insert_empty_rows(
-      table_group_x_variable,
-      empty_rows_col
-    )
-  }
-
   # Check if it is a list or dataset.
   if (is.data.frame(table_group_x_variable)) {
     results_table_group_x_variable <- table_group_x_variable
-    is_list <- FALSE
   } else {
     # check if list contains all the elements.
     if (!all(c(table_name) %in% names(table_group_x_variable))) {
-      stop("Cannot identify one element of the list.")
+      stop(sprintf("Cannot identify '%s' element of the list.", table_name))
     }
     results_table_group_x_variable <- table_group_x_variable[[table_name]]
-    is_list <- TRUE
+  }
+
+  # Strip out UUID column immediately if it exists so it doesn't pollute the output
+  if ("uuid" %in% names(results_table_group_x_variable)) {
+    results_table_group_x_variable$uuid <- NULL
+  }
+
+  # Insert empty rows if requested
+  if (
+    insert_empty_rows &&
+      empty_rows_col %in% names(results_table_group_x_variable)
+  ) {
+    results_table_group_x_variable <- insert_empty_rows(
+      results_table_group_x_variable,
+      empty_rows_col
+    )
   }
 
   # --- Setup Styles Internally so this function references everything it needs ---
@@ -181,7 +195,7 @@ format_my_xlsx_variable_x_group <- function(
     wb,
     sheet = table_sheet_name,
     x = results_table_group_x_variable,
-    startRow = 2
+    startRow = 2 # Write headers to row 2, data to row 3+
   )
 
   # count number of columns before "stat_"
@@ -202,8 +216,11 @@ format_my_xlsx_variable_x_group <- function(
   #    - Merge them in row 1
   #    - Extract the group name from the first column (after "stat_")
   #    - Write that group name into the merged cell
-  #    - Remove the "_<group>" substring from each of the three headers
+  #    - Remove the "_<group>" substring from each of the headers
   #----------------------------------------------------------------------
+
+  stat_length <- length(c(value_columns, total_columns))
+
   col_index <- 1
   while (col_index <= num_cols) {
     this_col_name <- col_names[col_index]
@@ -211,10 +228,12 @@ format_my_xlsx_variable_x_group <- function(
     if (startsWith(this_col_name, "stat_")) {
       group_name <- sub("^stat_", "", this_col_name) # e.g. "stat_overall" -> "overall"
       merge_start <- col_index
-      merge_end <- col_index + 2
+      merge_end <- col_index + (stat_length - 1)
 
       if (merge_end > num_cols) {
-        stop("Not enough columns to merge in sets of three. Check your data.")
+        stop(
+          "Not enough columns to merge based on sets indicated by value_columns/total_columns count. Check your data."
+        )
       }
 
       openxlsx::mergeCells(
@@ -238,7 +257,7 @@ format_my_xlsx_variable_x_group <- function(
         col_names[c] <- sub(paste0("_", group_name), "", col_names[c])
       }
 
-      col_index <- col_index + 3
+      col_index <- col_index + stat_length
     } else {
       col_index <- col_index + 1
     }
@@ -270,12 +289,14 @@ format_my_xlsx_variable_x_group <- function(
     non_na_question_rows <- 1:nrow(results_table_group_x_variable)
   }
 
-  # Apply styles
+  # Apply styles dynamically referencing the exact row lengths
+  max_row_index <- nrow(results_table_group_x_variable) + 2
+
   openxlsx::addStyle(
     wb,
     sheet = table_sheet_name,
     style = secondary_beige_cell_style,
-    rows = c(1:nrow(results_table_group_x_variable) + 1), # Adjusted for header
+    rows = 2:max_row_index,
     cols = c(variable_min_cols_index:variable_max_cols_index),
     gridExpand = TRUE,
     stack = TRUE
@@ -285,7 +306,7 @@ format_my_xlsx_variable_x_group <- function(
     wb,
     sheet = table_sheet_name,
     style = thick_left_borderstyle,
-    rows = c(1:nrow(results_table_group_x_variable) + 1),
+    rows = 2:max_row_index,
     cols = c(variable_min_cols_index, variable_min_cols_index),
     gridExpand = TRUE,
     stack = TRUE
@@ -295,7 +316,7 @@ format_my_xlsx_variable_x_group <- function(
     wb,
     sheet = table_sheet_name,
     style = thick_top_borderstyle,
-    rows = c(2:2),
+    rows = 2,
     cols = c(variable_min_cols_index:variable_max_cols_index),
     gridExpand = TRUE,
     stack = TRUE
@@ -305,7 +326,7 @@ format_my_xlsx_variable_x_group <- function(
     wb,
     sheet = table_sheet_name,
     style = thick_right_borderstyle,
-    rows = c(non_na_question_rows + 1),
+    rows = c(2, non_na_question_rows + 2),
     cols = c(variable_max_cols_index:variable_max_cols_index),
     gridExpand = TRUE,
     stack = TRUE
@@ -315,12 +336,7 @@ format_my_xlsx_variable_x_group <- function(
     wb,
     sheet = table_sheet_name,
     style = thick_bottom_borderstyle,
-    rows = c(
-      (nrow(results_table_group_x_variable) + 1):(nrow(
-        results_table_group_x_variable
-      ) +
-        1)
-    ),
+    rows = max_row_index,
     cols = c(variable_min_cols_index:variable_max_cols_index),
     gridExpand = TRUE,
     stack = TRUE
@@ -330,29 +346,30 @@ format_my_xlsx_variable_x_group <- function(
   stat_min_cols_index <- variable_max_cols_index + 1
   stat_max_cols_index <- ncol(results_table_group_x_variable)
 
-  stat_length <- length(c(value_columns, total_columns))
   stat_total_cols <- stat_max_cols_index - variable_max_cols_index
-  stat_sets_number <- stat_total_cols / 2
+  stat_sets_number <- stat_total_cols / stat_length
+
+  if ((stat_total_cols %% stat_length) != 0) {
+    stop(
+      "Length of value_columns/total_columns does not align fully with the table."
+    )
+  }
 
   helper_table <- data.frame(
     sets = paste0("set", 1:stat_sets_number),
     min_cols_index = cumsum(c(
       stat_min_cols_index,
-      rep(3, stat_sets_number - 1)
+      rep(stat_length, stat_sets_number - 1)
     )),
     max_cols_index = cumsum(c(
-      stat_min_cols_index + 2,
-      rep(3, stat_sets_number - 1)
+      stat_min_cols_index + stat_length - 1,
+      rep(stat_length, stat_sets_number - 1)
     ))
   )
 
-  if ((stat_total_cols %% stat_sets_number) != 0) {
-    stop("Length of value_columns does not match with the table.")
-  }
-
   if (stat_length == 1) {
     warning(
-      "Length of value_columns is one, function cannot checks the number of columns."
+      "Length of value_columns/total_columns is one, function cannot strictly check the number of columns."
     )
   }
 
@@ -363,48 +380,60 @@ format_my_xlsx_variable_x_group <- function(
   )
 
   if ("analysis_type" %in% names(results_table_group_x_variable)) {
-    proportion_lines <- grepl(
+    proportion_rows <- which(grepl(
       "prop_select",
-      c("title", results_table_group_x_variable$analysis_type)
-    )
+      results_table_group_x_variable$analysis_type
+    )) +
+      2
+    non_proportion_rows <- which(
+      !grepl("prop_select", results_table_group_x_variable$analysis_type)
+    ) +
+      2
   } else {
-    proportion_lines <- rep(FALSE, nrow(results_table_group_x_variable) + 1)
+    proportion_rows <- integer(0)
+    non_proportion_rows <- 2:max_row_index
   }
 
-  openxlsx::addStyle(
-    wb,
-    sheet = table_sheet_name,
-    style = proportion_number_style,
-    rows = c(1:(nrow(results_table_group_x_variable) + 1))[proportion_lines],
-    cols = c(1:stat_max_cols_index)[value_columns_index],
-    gridExpand = TRUE,
-    stack = TRUE
-  )
+  if (length(proportion_rows) > 0 && sum(value_columns_index) > 0) {
+    openxlsx::addStyle(
+      wb,
+      sheet = table_sheet_name,
+      style = proportion_number_style,
+      rows = proportion_rows,
+      cols = which(value_columns_index),
+      gridExpand = TRUE,
+      stack = TRUE
+    )
+  }
 
-  openxlsx::addStyle(
-    wb,
-    sheet = table_sheet_name,
-    style = number_2digits_style,
-    rows = c(1:(nrow(results_table_group_x_variable) + 1))[!proportion_lines],
-    cols = c(1:stat_max_cols_index)[value_columns_index],
-    gridExpand = TRUE,
-    stack = TRUE
-  )
+  if (length(non_proportion_rows) > 0 && sum(value_columns_index) > 0) {
+    openxlsx::addStyle(
+      wb,
+      sheet = table_sheet_name,
+      style = number_2digits_style,
+      rows = non_proportion_rows,
+      cols = which(value_columns_index),
+      gridExpand = TRUE,
+      stack = TRUE
+    )
+  }
 
   if (!is.null(total_columns)) {
     total_columns_index <- stringr::str_starts(
       names(results_table_group_x_variable),
       stringr::str_c(total_columns, collapse = "|")
     )
-    openxlsx::addStyle(
-      wb,
-      sheet = table_sheet_name,
-      style = number_style,
-      rows = c(1:(nrow(results_table_group_x_variable) + 1)),
-      cols = c(1:stat_max_cols_index)[total_columns_index],
-      gridExpand = TRUE,
-      stack = TRUE
-    )
+    if (sum(total_columns_index) > 0) {
+      openxlsx::addStyle(
+        wb,
+        sheet = table_sheet_name,
+        style = number_style,
+        rows = 2:max_row_index,
+        cols = which(total_columns_index),
+        gridExpand = TRUE,
+        stack = TRUE
+      )
+    }
   }
 
   ### formatting the background
@@ -414,7 +443,7 @@ format_my_xlsx_variable_x_group <- function(
         wb,
         sheet = table_sheet_name,
         style = secondary_white_cell_style,
-        rows = c(1:nrow(results_table_group_x_variable) + 2),
+        rows = 2:max_row_index,
         cols = c(
           helper_table[i, "min_cols_index"]:helper_table[i, "max_cols_index"]
         ),
@@ -426,7 +455,7 @@ format_my_xlsx_variable_x_group <- function(
         wb,
         sheet = table_sheet_name,
         style = secondary_grey_cell_style,
-        rows = c(1:nrow(results_table_group_x_variable) + 2),
+        rows = 2:max_row_index,
         cols = c(
           helper_table[i, "min_cols_index"]:helper_table[i, "max_cols_index"]
         ),
@@ -439,7 +468,7 @@ format_my_xlsx_variable_x_group <- function(
       wb,
       sheet = table_sheet_name,
       style = thick_left_borderstyle,
-      rows = c(1:nrow(results_table_group_x_variable) + 1),
+      rows = 2:max_row_index,
       cols = c(
         helper_table[i, "min_cols_index"]:helper_table[i, "min_cols_index"]
       ),
@@ -450,7 +479,7 @@ format_my_xlsx_variable_x_group <- function(
       wb,
       sheet = table_sheet_name,
       style = thick_top_borderstyle,
-      rows = c(2:2),
+      rows = 2,
       cols = c(
         helper_table[i, "min_cols_index"]:helper_table[i, "max_cols_index"]
       ),
@@ -461,7 +490,7 @@ format_my_xlsx_variable_x_group <- function(
       wb,
       sheet = table_sheet_name,
       style = thick_right_borderstyle,
-      rows = c(1:nrow(results_table_group_x_variable) + 1),
+      rows = 2:max_row_index,
       cols = c(
         helper_table[i, "max_cols_index"]:helper_table[i, "max_cols_index"]
       ),
@@ -472,12 +501,7 @@ format_my_xlsx_variable_x_group <- function(
       wb,
       sheet = table_sheet_name,
       style = thick_bottom_borderstyle,
-      rows = c(
-        (nrow(results_table_group_x_variable) + 1):(nrow(
-          results_table_group_x_variable
-        ) +
-          1)
-      ),
+      rows = max_row_index,
       cols = c(
         helper_table[i, "min_cols_index"]:helper_table[i, "max_cols_index"]
       ),
@@ -486,7 +510,7 @@ format_my_xlsx_variable_x_group <- function(
     )
   }
 
-  # Add grey background style to rows where the first column is NA
+  # Add grey background style to empty rows
   if (ncol(results_table_group_x_variable) >= 3) {
     na_rows <- which(is.na(results_table_group_x_variable[[3]]))
     if (length(na_rows) > 0) {
@@ -502,35 +526,12 @@ format_my_xlsx_variable_x_group <- function(
     }
   }
 
-  stat_cols <- which(startsWith(names(results_table_group_x_variable), "stat_"))
-
-  if ("analysis_type" %in% names(results_table_group_x_variable)) {
-    percent_rows <- which(
-      results_table_group_x_variable$analysis_type != "Mean"
-    ) +
-      2
-  } else {
-    percent_rows <- integer(0)
-  }
-
-  percent_style <- openxlsx::createStyle(numFmt = "0.00%")
-  if (length(percent_rows) > 0 && length(stat_cols) > 0) {
-    openxlsx::addStyle(
-      wb,
-      sheet = table_sheet_name,
-      style = percent_style,
-      rows = percent_rows,
-      cols = stat_cols,
-      gridExpand = TRUE,
-      stack = TRUE
-    )
-  }
-
+  # Conditional formatting exclusively targeting the stat_overall column
   if ("stat_overall" %in% names(results_table_group_x_variable)) {
     r <- rle(!is.na(results_table_group_x_variable$stat_overall))
     start_idx <- cumsum(c(1, r$lengths[-length(r$lengths)]))
     end_idx <- start_idx + r$lengths - 1
-    valid_groups <- which(r$lengths > 1)
+    valid_groups <- which(r$lengths > 1 & r$values == TRUE)
 
     stat_overall_col_index <- which(
       names(results_table_group_x_variable) == "stat_overall"
@@ -541,11 +542,21 @@ format_my_xlsx_variable_x_group <- function(
         wb,
         sheet = table_sheet_name,
         cols = stat_overall_col_index,
-        rows = rows + 1,
+        rows = rows + 2,
         type = "colorScale",
         style = c("#fff0f3", "#f9b4b3", "#EE5859")
       )
     }
+  }
+
+  # Finding where to freeze panes dynamically. Defaulting dynamically to analysis_var_value
+  analysis_var_col_index <- which(
+    names(results_table_group_x_variable) == "analysis_var_value"
+  )
+  if (length(analysis_var_col_index) > 0) {
+    freeze_col <- analysis_var_col_index[1] + 1
+  } else {
+    freeze_col <- 5
   }
 
   openxlsx::addStyle(
@@ -553,7 +564,7 @@ format_my_xlsx_variable_x_group <- function(
     sheet = table_sheet_name,
     style = header_style,
     rows = 1,
-    cols = 5:ncol(results_table_group_x_variable),
+    cols = freeze_col:ncol(results_table_group_x_variable),
     gridExpand = TRUE
   )
   openxlsx::addStyle(
@@ -569,7 +580,7 @@ format_my_xlsx_variable_x_group <- function(
     wb,
     table_sheet_name,
     firstActiveRow = 3,
-    firstActiveCol = 5
+    firstActiveCol = freeze_col
   )
 
   if (is.null(file_path)) {
