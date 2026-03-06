@@ -14,7 +14,7 @@ format_my_xlsx_variable_x_group(
   table_sheet_name = "variable_x_group_table",
   overwrite = FALSE,
   insert_empty_rows = FALSE,
-  empty_rows_col = "question"
+  empty_rows_col = "analysis_var"
 )
 }
 \arguments{
