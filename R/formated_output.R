@@ -6,7 +6,7 @@
 #' @param col The column used to identify groups.
 #' @return A modified dataset with empty rows separating distinct groups.
 #' @keywords internal
-insert_empty_rows <- function(df, col) {
+add_empty_rows_between_groups <- function(df, col) {
   # Compute run-length encoding for the target column
   r <- rle(as.character(df[[col]]))
 
@@ -83,7 +83,7 @@ format_my_xlsx_variable_x_group <- function(
   table_sheet_name = "variable_x_group_table",
   overwrite = FALSE,
   insert_empty_rows = FALSE,
-  empty_rows_col = "question"
+  empty_rows_col = "analysis_var"
 ) {
   # Check if it is a list or dataset.
   if (is.data.frame(table_group_x_variable)) {
@@ -101,12 +101,31 @@ format_my_xlsx_variable_x_group <- function(
     results_table_group_x_variable$uuid <- NULL
   }
 
+  # Rename analysis_var -> question, analysis_var_value -> option for cleaner output
+  if ("analysis_var" %in% names(results_table_group_x_variable)) {
+    names(results_table_group_x_variable)[
+      names(results_table_group_x_variable) == "analysis_var"
+    ] <- "question"
+  }
+  if ("analysis_var_value" %in% names(results_table_group_x_variable)) {
+    names(results_table_group_x_variable)[
+      names(results_table_group_x_variable) == "analysis_var_value"
+    ] <- "option"
+  }
+  # Resolve the empty_rows_col name after potential rename
+  if (
+    empty_rows_col == "analysis_var" &&
+      "question" %in% names(results_table_group_x_variable)
+  ) {
+    empty_rows_col <- "question"
+  }
+
   # Insert empty rows if requested
   if (
-    insert_empty_rows &&
+    isTRUE(insert_empty_rows) &&
       empty_rows_col %in% names(results_table_group_x_variable)
   ) {
-    results_table_group_x_variable <- insert_empty_rows(
+    results_table_group_x_variable <- add_empty_rows_between_groups(
       results_table_group_x_variable,
       empty_rows_col
     )
@@ -549,10 +568,15 @@ format_my_xlsx_variable_x_group <- function(
     }
   }
 
-  # Finding where to freeze panes dynamically. Defaulting dynamically to analysis_var_value
+  # Finding where to freeze panes dynamically — after renaming, look for "option" first, then fall back
   analysis_var_col_index <- which(
-    names(results_table_group_x_variable) == "analysis_var_value"
+    names(results_table_group_x_variable) == "option"
   )
+  if (length(analysis_var_col_index) == 0) {
+    analysis_var_col_index <- which(
+      names(results_table_group_x_variable) == "analysis_var_value"
+    )
+  }
   if (length(analysis_var_col_index) > 0) {
     freeze_col <- analysis_var_col_index[1] + 1
   } else {
