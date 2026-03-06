@@ -41,8 +41,8 @@ run_group_analysis_pipeline <- function(
     var <- group_variables[i]
     is_first <- (i == 1)
 
-    message(sprintf(
-      "Processing group variable (%d/%d): %s",
+    cat(sprintf(
+      "\nProcessing group variable (%d/%d): %s\n",
       i,
       length(group_variables),
       var
