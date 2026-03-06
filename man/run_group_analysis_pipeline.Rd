@@ -13,7 +13,7 @@ run_group_analysis_pipeline(
   weight_column = "weights",
   strata_column = "sample_location",
   value_columns = c("stat", "n", "n_total"),
-  extra_columns = c("order", "number", "sector", "indicator", "subset")
+  extra_columns = NULL
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ run_group_analysis_pipeline(
 
 \item{value_columns}{Columns to extract from results. Defaults to c("stat", "n", "n_total").}
 
-\item{extra_columns}{Extra columns to keep. Defaults to c("order", "number", "sector", "indicator", "subset").}
+\item{extra_columns}{Extra columns to keep. Defaults to NULL.}
 }
 \value{
 A list containing \code{combined_results} (the merged dataset spanning all group variables) and \code{uuid_table} (the baseline UUID mappings).
