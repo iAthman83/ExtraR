@@ -15,7 +15,7 @@
 #' @param weight_column The column name for survey weights. Defaults to "weights".
 #' @param strata_column The column name for survey strata. Defaults to "sample_location".
 #' @param value_columns Columns to extract from results. Defaults to c("stat", "n", "n_total").
-#' @param extra_columns Extra columns to keep. Defaults to c("order", "number", "sector", "indicator", "subset").
+#' @param extra_columns Extra columns to keep. Defaults to NULL.
 #' @return A list containing \code{combined_results} (the merged dataset spanning all group variables) and \code{uuid_table} (the baseline UUID mappings).
 #' @export
 #' @importFrom dplyr mutate filter all_of left_join select relocate n across pull
@@ -32,7 +32,7 @@ run_group_analysis_pipeline <- function(
   weight_column = "weights",
   strata_column = "sample_location",
   value_columns = c("stat", "n", "n_total"),
-  extra_columns = c("order", "number", "sector", "indicator", "subset")
+  extra_columns = NULL
 ) {
   combined_analysis <- NULL
   uuid_table <- NULL
@@ -40,6 +40,13 @@ run_group_analysis_pipeline <- function(
   for (i in seq_along(group_variables)) {
     var <- group_variables[i]
     is_first <- (i == 1)
+
+    message(sprintf(
+      "Processing group variable (%d/%d): %s",
+      i,
+      length(group_variables),
+      var
+    ))
 
     # 1. Format DAP for the current group
     my_loa <- dap %>%
@@ -99,7 +106,11 @@ run_group_analysis_pipeline <- function(
     )
 
     # 7. Pivot results using custom function
-    valid_extra_columns <- intersect(extra_columns, names(label_results))
+    if (!is.null(extra_columns)) {
+      valid_extra_columns <- intersect(extra_columns, names(label_results))
+    } else {
+      valid_extra_columns <- NULL
+    }
 
     label_results_final <- my_create_table_variable_x_group(
       label_results,
