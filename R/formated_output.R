@@ -40,14 +40,6 @@ add_empty_rows_between_groups <- function(df, col) {
     idx <- idx + group_length
   }
 
-  # Insert an empty row after the absolute last group too
-  if (nrow(new_df) > 0) {
-    empty_row <- setNames(as.list(rep(NA, ncol(df))), names(df))
-    empty_row[[1]] <- new_df[nrow(new_df), 1]
-    empty_row[[2]] <- new_df[nrow(new_df), 2]
-    new_df <- rbind(new_df, empty_row)
-  }
-
   return(new_df)
 }
 
@@ -545,22 +537,43 @@ format_my_xlsx_variable_x_group <- function(
     }
   }
 
-  # Conditional formatting exclusively targeting the stat_overall column
-  if ("stat_overall" %in% names(results_table_group_x_variable)) {
-    r <- rle(!is.na(results_table_group_x_variable$stat_overall))
-    start_idx <- cumsum(c(1, r$lengths[-length(r$lengths)]))
-    end_idx <- start_idx + r$lengths - 1
-    valid_groups <- which(r$lengths > 1 & r$values == TRUE)
+  # Conditional formatting: target the first stat_ column after the 'option' column
+  # (previously 'analysis_var_value' before rename)
+  option_col_index <- which(
+    names(results_table_group_x_variable) %in% c("option", "analysis_var_value")
+  )
+  if (length(option_col_index) > 0) {
+    # Find the first column starting with stat_ that comes after the option column
+    first_stat_col_index <- which(startsWith(
+      names(results_table_group_x_variable),
+      "stat_"
+    ))
+    first_stat_col_index <- first_stat_col_index[
+      first_stat_col_index > option_col_index[1]
+    ][1]
+  } else {
+    first_stat_col_index <- which(startsWith(
+      names(results_table_group_x_variable),
+      "stat_"
+    ))[1]
+  }
 
-    stat_overall_col_index <- which(
-      names(results_table_group_x_variable) == "stat_overall"
-    )
-    for (group in valid_groups) {
-      rows <- start_idx[group]:end_idx[group]
+  if (!is.na(first_stat_col_index)) {
+    # Use the first stat_ column to detect per-question groups via run-length encoding
+    stat_first_col_vals <- results_table_group_x_variable[[
+      first_stat_col_index
+    ]]
+    r2 <- rle(!is.na(stat_first_col_vals))
+    start_idx2 <- cumsum(c(1, r2$lengths[-length(r2$lengths)]))
+    end_idx2 <- start_idx2 + r2$lengths - 1
+    valid_groups2 <- which(r2$lengths > 1 & r2$values == TRUE)
+
+    for (group in valid_groups2) {
+      rows <- start_idx2[group]:end_idx2[group]
       openxlsx::conditionalFormatting(
         wb,
         sheet = table_sheet_name,
-        cols = stat_overall_col_index,
+        cols = first_stat_col_index,
         rows = rows + 2,
         type = "colorScale",
         style = c("#fff0f3", "#f9b4b3", "#EE5859")
