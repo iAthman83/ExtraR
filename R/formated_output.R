@@ -238,6 +238,10 @@ format_my_xlsx_variable_x_group <- function(
 
     if (startsWith(this_col_name, "stat_")) {
       group_name <- sub("^stat_", "", this_col_name) # e.g. "stat_overall" -> "overall"
+      # If the DAP group_var was NA (Overall group), label it "Overall" instead of "NA"
+      if (group_name == "NA") {
+        group_name <- "Overall"
+      }
       merge_start <- col_index
       merge_end <- col_index + (stat_length - 1)
 
