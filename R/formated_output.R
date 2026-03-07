@@ -19,9 +19,12 @@ add_empty_rows_between_groups <- function(df, col) {
     group_length <- r$lengths[i]
     group_rows <- df[idx:(idx + group_length - 1), ]
 
-    # Sort the group by the stat_overall column in ascending order
-    if ("stat_overall" %in% names(group_rows)) {
-      group_rows <- group_rows[order(group_rows$stat_overall, na.last = TRUE), ]
+    # Sort the group by the first stat_ column in descending order (biggest to smallest)
+    first_stat_col <- which(startsWith(names(group_rows), "stat_"))[1]
+    if (!is.na(first_stat_col)) {
+      group_rows <- group_rows[
+        order(group_rows[[first_stat_col]], decreasing = TRUE, na.last = TRUE),
+      ]
     }
 
     new_df <- rbind(new_df, group_rows)
