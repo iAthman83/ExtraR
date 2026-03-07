@@ -34,10 +34,6 @@ add_empty_rows_between_groups <- function(df, col) {
       # Create an empty row with NA values
       empty_row <- setNames(as.list(rep(NA, ncol(df))), names(df))
 
-      # Copy values from the first and second columns of the last row
-      empty_row[[1]] <- group_rows[nrow(group_rows), 1]
-      empty_row[[2]] <- group_rows[nrow(group_rows), 2]
-
       new_df <- rbind(new_df, empty_row)
     }
     idx <- idx + group_length
