@@ -127,6 +127,13 @@ run_group_analysis_pipeline <- function(
           paste0("var_", analysis_var),
           analysis_var_value
         )
+      ) %>%
+      # Remove var_xxx placeholder rows for proportion analyses.
+      # For mean/median, the var_xxx row IS the real data, so keep those.
+      # For proportions, every real row has an actual option value, so var_xxx is garbage.
+      dplyr::filter(
+        !(startsWith(analysis_var_value, "var_") &
+          grepl("prop", tolower(analysis_type)))
       )
 
     # 8. Manage UUIDs across groupings
