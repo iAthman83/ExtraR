@@ -240,7 +240,8 @@ format_my_xlsx_variable_x_group <- function(
     this_col_name <- col_names[col_index]
 
     if (startsWith(this_col_name, "stat_")) {
-      group_name <- sub("^stat_", "", this_col_name) # e.g. "stat_overall" -> "overall"
+      raw_suffix <- sub("^stat_", "", this_col_name) # actual suffix in col names, e.g. "NA"
+      group_name <- raw_suffix # display label for row 1
       # If the DAP group_var was NA (Overall group), label it "Overall" instead of "NA"
       if (group_name == "NA") {
         group_name <- "Overall"
@@ -264,15 +265,16 @@ format_my_xlsx_variable_x_group <- function(
       openxlsx::writeData(
         wb,
         sheet = table_sheet_name,
-        x = group_name,
+        x = group_name, # "Overall" (display)
         startRow = 1,
         startCol = merge_start,
         colNames = FALSE,
         rowNames = FALSE
       )
 
+      # Strip using the raw suffix (e.g. "_NA"), NOT the display label ("_Overall")
       for (c in merge_start:merge_end) {
-        col_names[c] <- sub(paste0("_", group_name), "", col_names[c])
+        col_names[c] <- sub(paste0("_", raw_suffix), "", col_names[c])
       }
 
       col_index <- col_index + stat_length
