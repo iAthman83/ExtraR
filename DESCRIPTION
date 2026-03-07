@@ -4,8 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Abubakar", "Athman", , "athman.abu@gmail.com", role = c("aut", "cre"))
 Description: Provides structured analysis pipelines and formatted output generators for handling grouped survey data. It automates iterative group analyses using established survey methodology packages while intelligently aligning results by stable dynamic UUIDs. It also outputs complete variable-by-group reports styled directly into presentation-ready Excel worksheets with color mappings and dynamic percentage formatting.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

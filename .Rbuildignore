@@ -2,3 +2,4 @@
 ^renv\.lock$
 ^extrar\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
