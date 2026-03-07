@@ -6,7 +6,7 @@
 \usage{
 run_group_analysis_pipeline(
   dataset,
-  dap,
+  loa,
   group_variables = c("Overall"),
   tool_survey,
   tool_choices,
@@ -19,7 +19,10 @@ run_group_analysis_pipeline(
 \arguments{
 \item{dataset}{The survey dataset.}
 
-\item{dap}{Data Analysis Plan as a data frame.}
+\item{loa}{List of Analysis (LOA) as a data frame. This is typically loaded from an Excel file
+containing the full list of variables to analyse, their analysis types, and metadata columns.
+Common optional metadata columns that can be passed via \code{extra_columns} include
+\code{sector}, \code{indicator}, and \code{subset_indicator}.}
 
 \item{group_variables}{A character vector of group variables to iterate over. Defaults to c("Overall").}
 
@@ -33,7 +36,7 @@ run_group_analysis_pipeline(
 
 \item{value_columns}{Columns to extract from results. Defaults to c("stat", "n", "n_total").}
 
-\item{extra_columns}{Extra columns to keep. Defaults to NULL.}
+\item{extra_columns}{Extra LOA metadata columns to carry through to the output (e.g. \code{c("sector", "indicator", "subset_indicator")}). Defaults to NULL.}
 }
 \value{
 A list containing \code{combined_results} (the merged dataset spanning all group variables) and \code{uuid_table} (the baseline UUID mappings).
