@@ -8,14 +8,17 @@
 #' read and write to an Excel file during the loop, producing one massive dataset spanning all groups.
 #'
 #' @param dataset The survey dataset.
-#' @param dap Data Analysis Plan as a data frame.
+#' @param loa List of Analysis (LOA) as a data frame. This is typically loaded from an Excel file
+#'   containing the full list of variables to analyse, their analysis types, and metadata columns.
+#'   Common optional metadata columns that can be passed via \code{extra_columns} include
+#'   \code{sector}, \code{indicator}, and \code{subset_indicator}.
 #' @param group_variables A character vector of group variables to iterate over. Defaults to c("Overall").
 #' @param tool_survey The Kobo tool survey sheet.
 #' @param tool_choices The Kobo tool choices sheet.
 #' @param weight_column The column name for survey weights. Defaults to "weights".
 #' @param strata_column The column name for survey strata. Defaults to "sample_location".
 #' @param value_columns Columns to extract from results. Defaults to c("stat", "n", "n_total").
-#' @param extra_columns Extra columns to keep. Defaults to NULL.
+#' @param extra_columns Extra LOA metadata columns to carry through to the output (e.g. \code{c("sector", "indicator", "subset_indicator")}). Defaults to NULL.
 #' @return A list containing \code{combined_results} (the merged dataset spanning all group variables) and \code{uuid_table} (the baseline UUID mappings).
 #' @export
 #' @importFrom dplyr mutate filter all_of left_join select relocate n across pull
@@ -25,7 +28,7 @@
 #' @importFrom presentresults create_label_dictionary add_label_columns_to_results_table
 run_group_analysis_pipeline <- function(
   dataset,
-  dap,
+  loa,
   group_variables = c("Overall"),
   tool_survey,
   tool_choices,
@@ -48,8 +51,8 @@ run_group_analysis_pipeline <- function(
       var
     ))
 
-    # 1. Format DAP for the current group
-    my_loa <- dap %>%
+    # 1. Format LOA for the current group
+    my_loa <- loa %>%
       dplyr::mutate(group_var = ifelse(var == "Overall", group_var, var)) %>%
       dplyr::filter(analysis_var != var) %>%
       dplyr::filter(analysis_var %in% colnames(dataset))
