@@ -125,7 +125,7 @@ format_my_xlsx_variable_x_group <- function(
   # --- Setup Styles Internally so this function references everything it needs ---
   number_2digits_style <- openxlsx::createStyle(numFmt = "0.00")
   number_style <- openxlsx::createStyle(numFmt = "0")
-  proportion_number_style <- openxlsx::createStyle(numFmt = "PERCENTAGE")
+  proportion_number_style <- openxlsx::createStyle(numFmt = "0.00%")
 
   thick_left_borderstyle <- openxlsx::createStyle(
     borderStyle = "thick",
@@ -396,13 +396,21 @@ format_my_xlsx_variable_x_group <- function(
   )
 
   if ("analysis_type" %in% names(results_table_group_x_variable)) {
-    proportion_rows <- which(grepl(
-      "prop_select",
-      results_table_group_x_variable$analysis_type
-    )) +
+    # Any analysis type that is not mean or median
+    proportion_rows <- which(
+      !grepl(
+        "mean|median",
+        tolower(results_table_group_x_variable$analysis_type)
+      )
+    ) +
       2
+
+    # Analysis types that are mean or median
     non_proportion_rows <- which(
-      !grepl("prop_select", results_table_group_x_variable$analysis_type)
+      grepl(
+        "mean|median",
+        tolower(results_table_group_x_variable$analysis_type)
+      )
     ) +
       2
   } else {
