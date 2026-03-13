@@ -2,12 +2,12 @@
 
 ## Overview
 
-The `extrar` package is designed to take the headache out of running complex survey data analysis. Instead of constantly writing loops and dealing with messy merges, `extrar` gives you a clean pipeline that automatically processes multiple grouping variables at once and turns those raw numbers into beautifully formatted, presentation-ready Excel tables right out of the box. It has two main components:
+The `extrar` package takes the headache out of manually expanding your List of Analysis (LOA) to cover every single grouping variable. It automatically processes multiple grouping variables at once and seamlessly map metadata like sectors, indicators, and sub-indicators straight from your LOA into the final output. It has two main components:
 
 1. **Analysis Workflow Pipeline (`run_group_analysis_pipeline`)**: Integrates directly with survey designs and `presentresults` to iteratively apply standard analysis across multiple group variables. It automatically generates output from all the analysis types listed in your LOA file.
 2. **Formatted Excel Exporting (`format_my_xlsx_variable_x_group`)**: Function to reshape and pivot the complex survey analysis outputs into a presentation-ready Excel document.
 
-> **Note:** `extrar` builds on top of the [`presentresults`](https://github.com/impact-initiatives/presentresults) package for label creation and results table formatting.
+> **Note:** `extrar` builds on top of the [`presentresults`](https://github.com/impact-initiatives/presentresults) package for label creation and results table formatting. Install this package first.
 
 ## Installation
 
