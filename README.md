@@ -79,3 +79,29 @@ format_my_xlsx_variable_x_group(
   overwrite              = TRUE
 )
 ```
+
+## Examples
+
+Below are examples of how the LOA translates into the final formatted Excel output.
+
+### 1. Basic Analysis (Without Extra Columns)
+
+When running the pipeline with standard analysis types and no extra metadata columns:
+
+<p align="center">
+  <img src="man/figures/loa_basic.png" width="45%" alt="LOA Without Extra Columns" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="man/figures/output_basic.png" width="45%" alt="Formatted Output Without Extra Columns" />
+</p>
+<p align="center"><em>Left: Basic LOA input. Right: Resulting formatted Excel output.</em></p>
+
+### 2. Advanced Analysis (With Extra Columns)
+
+When passing metadata columns (like `sector` and `indicator`) via the `extra_columns` argument, they are neatly preserved and arranged in the final output block:
+
+<p align="center">
+  <img src="man/figures/loa_extra.png" width="45%" alt="LOA With Extra Columns" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="man/figures/output_extra.png" width="45%" alt="Formatted Output With Extra Columns" />
+</p>
+<p align="center"><em>Left: LOA with sector/indicator columns. Right: Output featuring those extra columns mapped correctly.</em></p>
