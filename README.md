@@ -31,7 +31,7 @@ Create or load your LOA file. It must contain these columns:
 | `group_var` | Leave blank — populated automatically by the pipeline |
 | `level` | Confidence level, e.g. `0.95` |
 
-You can also include optional metadata columns such as `sector`, `indicator`, and `sub_indicator` — these can be passed through to the output via `extra_columns`.
+**Note on Metadata:** You can include optional metadata columns such as `sector`, `indicator`, and `sub_indicator` directly in your LOA file. These extra columns will be automatically joined to the results when you pass their names via the `extra_columns` argument in Step 2.
 
 ```r
 library(readxl)
