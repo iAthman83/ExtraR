@@ -52,14 +52,7 @@ read_raw_data <- function(
 
   if (length(cols_date) > 0) {
     df <- df %>%
-      mutate_at(
-        cols_date,
-        ~ ifelse(
-          is.na(.),
-          NA,
-          as.character(as.Date(openxlsx::convertToDate(as.numeric(.))))
-        )
-      )
+      mutate_at(cols_date, ~ vapply(., parse_smart_date, character(1)))
   }
 
   # --- Convert datetime columns ---
@@ -73,14 +66,7 @@ read_raw_data <- function(
 
   if (length(cols_datetime) > 0) {
     df <- df %>%
-      mutate_at(
-        cols_datetime,
-        ~ ifelse(
-          is.na(.),
-          NA,
-          as.character(openxlsx::convertToDateTime(as.numeric(.)))
-        )
-      )
+      mutate_at(cols_datetime, ~ vapply(., parse_smart_datetime, character(1)))
   }
 
   # --- Rename id/uuid columns ---
@@ -162,14 +148,7 @@ read_loop_data <- function(
 
   if (length(cols_date) > 0) {
     df <- df %>%
-      mutate_at(
-        cols_date,
-        ~ ifelse(
-          is.na(.),
-          NA,
-          as.character(as.Date(openxlsx::convertToDate(as.numeric(.))))
-        )
-      )
+      mutate_at(cols_date, ~ vapply(., parse_smart_date, character(1)))
   }
 
   # Datetime columns: survey types "start", "end", "datetime"
@@ -181,14 +160,7 @@ read_loop_data <- function(
 
   if (length(cols_datetime) > 0) {
     df <- df %>%
-      mutate_at(
-        cols_datetime,
-        ~ ifelse(
-          is.na(.),
-          NA,
-          as.character(openxlsx::convertToDateTime(as.numeric(.)))
-        )
-      )
+      mutate_at(cols_datetime, ~ vapply(., parse_smart_datetime, character(1)))
   }
 
   # --- Generate composite UUID (row_number within each parent uuid + parent uuid) ---
