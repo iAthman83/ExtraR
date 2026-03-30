@@ -22,8 +22,7 @@ Imports:
     rlang,
     crayon,
     readxl,
-    purrr,
-    lubridate
+    purrr
 Remotes: 
     impact-initiatives/cleaningtools,
     impact-initiatives/analysistools,
