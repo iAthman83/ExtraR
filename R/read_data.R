@@ -54,10 +54,10 @@ read_raw_data <- function(
     df <- df %>%
       mutate_at(
         cols_date,
-        ~ ifelse(
-          is.na(.),
-          NA,
-          as.character(as.Date(openxlsx::convertToDate(as.numeric(.))))
+        ~ dplyr::case_when(
+          is.na(.) ~ NA_character_,
+          stringr::str_detect(., "^[0-9]{4}-[0-9]{2}-[0-9]{2}") ~ as.character(.),
+          TRUE ~ as.character(as.Date(suppressWarnings(openxlsx::convertToDate(as.numeric(.)))))
         )
       )
   }
@@ -75,10 +75,10 @@ read_raw_data <- function(
     df <- df %>%
       mutate_at(
         cols_datetime,
-        ~ ifelse(
-          is.na(.),
-          NA,
-          as.character(openxlsx::convertToDateTime(as.numeric(.)))
+        ~ dplyr::case_when(
+          is.na(.) ~ NA_character_,
+          stringr::str_detect(., "^[0-9]{4}-[0-9]{2}-[0-9]{2}") ~ as.character(.),
+          TRUE ~ as.character(suppressWarnings(openxlsx::convertToDateTime(as.numeric(.))))
         )
       )
   }
@@ -164,10 +164,10 @@ read_loop_data <- function(
     df <- df %>%
       mutate_at(
         cols_date,
-        ~ ifelse(
-          is.na(.),
-          NA,
-          as.character(as.Date(openxlsx::convertToDate(as.numeric(.))))
+        ~ dplyr::case_when(
+          is.na(.) ~ NA_character_,
+          stringr::str_detect(., "^[0-9]{4}-[0-9]{2}-[0-9]{2}") ~ as.character(.),
+          TRUE ~ as.character(as.Date(suppressWarnings(openxlsx::convertToDate(as.numeric(.)))))
         )
       )
   }
@@ -183,10 +183,10 @@ read_loop_data <- function(
     df <- df %>%
       mutate_at(
         cols_datetime,
-        ~ ifelse(
-          is.na(.),
-          NA,
-          as.character(openxlsx::convertToDateTime(as.numeric(.)))
+        ~ dplyr::case_when(
+          is.na(.) ~ NA_character_,
+          stringr::str_detect(., "^[0-9]{4}-[0-9]{2}-[0-9]{2}") ~ as.character(.),
+          TRUE ~ as.character(suppressWarnings(openxlsx::convertToDateTime(as.numeric(.))))
         )
       )
   }
