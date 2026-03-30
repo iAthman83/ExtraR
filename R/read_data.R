@@ -35,14 +35,13 @@ read_raw_data <- function(
     " columns \n"
   )))
 
-  # --- Convert date columns ---
+  # --- Auto-detect date and datetime columns from kobo_survey ---
   cat(crayon::green("--> convert dates \n"))
-  # Auto-detect "today" type columns from survey + user-specified extras
+  # Date columns: survey types "today" and "date"
   cols_date <- c(
-    kobo_survey$name[kobo_survey$type %in% c("today")],
+    kobo_survey$name[kobo_survey$type %in% c("today", "date")],
     extra_date_cols
   )
-  # Only process columns that actually exist in the data
   cols_date <- intersect(cols_date, colnames(df))
 
   # Create submission_date from _submission_time if it exists
@@ -64,9 +63,9 @@ read_raw_data <- function(
   }
 
   # --- Convert datetime columns ---
+  # Datetime columns: survey types "start", "end", "datetime"
   cols_datetime <- c(
-    "start_time",
-    "end_time",
+    kobo_survey$name[kobo_survey$type %in% c("start", "end", "datetime")],
     "_submission_time",
     extra_datetime_cols
   )
@@ -147,21 +146,43 @@ read_loop_data <- function(
     " columns \n"
   )))
 
-  # --- Convert date columns ---
+  # --- Auto-detect date and datetime columns from kobo_survey ---
   cat(crayon::green("--> convert dates \n"))
+  # Date columns: survey types "today" and "date"
+  cols_date <- intersect(
+    kobo_survey$name[kobo_survey$type %in% c("today", "date")],
+    colnames(df)
+  )
+
+  # Create submission_date from submission time column if it exists
   if (submission_time_column %in% colnames(df)) {
+    df <- df %>% mutate(submission_date = !!sym(submission_time_column))
+    cols_date <- unique(c(cols_date, "submission_date"))
+  }
+
+  if (length(cols_date) > 0) {
     df <- df %>%
-      mutate(submission_date = !!sym(submission_time_column)) %>%
       mutate_at(
-        "submission_date",
+        cols_date,
         ~ ifelse(
           is.na(.),
           NA,
           as.character(as.Date(openxlsx::convertToDate(as.numeric(.))))
         )
-      ) %>%
+      )
+  }
+
+  # Datetime columns: survey types "start", "end", "datetime"
+  cols_datetime <- c(
+    kobo_survey$name[kobo_survey$type %in% c("start", "end", "datetime")],
+    submission_time_column
+  )
+  cols_datetime <- intersect(cols_datetime, colnames(df))
+
+  if (length(cols_datetime) > 0) {
+    df <- df %>%
       mutate_at(
-        submission_time_column,
+        cols_datetime,
         ~ ifelse(
           is.na(.),
           NA,
