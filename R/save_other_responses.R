@@ -44,7 +44,10 @@ prepare_other_responses <- function(
 
   select_cols_main <- c("uuid", var_other_raw)
   if (!is.null(extra_columns)) {
-    select_cols_main <- c(select_cols_main, intersect(extra_columns, colnames(raw_data)))
+    select_cols_main <- c(
+      select_cols_main,
+      intersect(extra_columns, colnames(raw_data))
+    )
   }
 
   other_responses_main <- raw_data %>%
@@ -66,7 +69,10 @@ prepare_other_responses <- function(
       if (length(var_other_loop) > 0) {
         select_cols_loop <- c("uuid", var_other_loop)
         if (!is.null(extra_columns)) {
-          select_cols_loop <- c(select_cols_loop, intersect(extra_columns, colnames(loop_df)))
+          select_cols_loop <- c(
+            select_cols_loop,
+            intersect(extra_columns, colnames(loop_df))
+          )
         }
 
         other_responses_loop <- loop_df %>%
@@ -86,9 +92,18 @@ prepare_other_responses <- function(
   # Build the dynamic select columns
   select_cols <- c("uuid")
   if (!is.null(extra_columns)) {
-    select_cols <- c(select_cols, intersect(extra_columns, colnames(other_responses)))
+    select_cols <- c(
+      select_cols,
+      intersect(extra_columns, colnames(other_responses))
+    )
   }
-  select_cols <- c(select_cols, "question_name", "list_name", "full_label", "response_en")
+  select_cols <- c(
+    select_cols,
+    "question_name",
+    "list_name",
+    "full_label",
+    "response_en"
+  )
 
   # Generate final dataframe
   df <- other_responses %>%
@@ -118,7 +133,9 @@ prepare_other_responses <- function(
       value <- raw_data[[ref_name]][raw_data$uuid == df$uuid[r]]
       if ((length(value) == 0 || is.na(value)) && !is.null(raw_loops)) {
         for (loop_df in raw_loops) {
-          if (ref_name %in% colnames(loop_df) && "uuid" %in% colnames(loop_df)) {
+          if (
+            ref_name %in% colnames(loop_df) && "uuid" %in% colnames(loop_df)
+          ) {
             value <- loop_df[[ref_name]][loop_df$uuid == df$uuid[r]]
             if (length(value) > 0 && !is.na(value)) break
           }
@@ -134,6 +151,7 @@ prepare_other_responses <- function(
     }
   }
 
+  df <- relocate(df, "selected_choices", .before = "response_en")
   return(df)
 }
 
