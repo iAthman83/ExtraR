@@ -20,7 +20,9 @@ Imports:
     srvyr,
     uuid,
     rlang,
-    crayon
+    crayon,
+    readxl,
+    purrr
 Remotes: 
     impact-initiatives/cleaningtools,
     impact-initiatives/analysistools,
