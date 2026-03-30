@@ -12,7 +12,15 @@ Imports:
     cleaningtools,
     analysistools,
     presentresults,
-    addindicators
+    addindicators,
+    dplyr,
+    stringr,
+    tidyr,
+    openxlsx,
+    srvyr,
+    uuid,
+    rlang,
+    crayon
 Remotes: 
     impact-initiatives/cleaningtools,
     impact-initiatives/analysistools,
