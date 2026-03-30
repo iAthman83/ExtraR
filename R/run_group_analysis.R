@@ -209,10 +209,10 @@ my_create_table_variable_x_group <- function(
   }
 
   # Create the analysis key table
-  analysis_key_table <- results_table |>
+  analysis_key_table <- results_table %>%
     analysistools::create_analysis_key_table(
       analysis_key_column = analysis_key
-    ) |>
+    ) %>%
     analysistools::unite_variables()
 
   # Join the analysis key table back to the results table and select necessary columns
@@ -220,7 +220,7 @@ my_create_table_variable_x_group <- function(
     analysis_key,
     value_columns,
     extra_columns
-  )] |>
+  )] %>%
     dplyr::left_join(analysis_key_table, by = analysis_key)
 
   if (list_for_excel) {
