@@ -2,23 +2,56 @@
 
 ## Overview
 
-The `extrar` package takes the headache out of manually expanding your List of Analysis (LOA) to cover every single grouping variable. It automatically processes multiple grouping variables at once and seamlessly map metadata like sectors, indicators, and sub-indicators straight from your LOA into the final output. It has two main components:
+The `extrar` package provides powerful tools for standardizing dataset structures and preparing "other" text responses for recoding. It also takes the headache out of complex survey data analysis by automatically processing multiple grouping variables at once and seamlessly mapping metadata (like sectors and indicators) straight from your List of Analysis (LOA) into the final output.
+
+It has three main components:
 
 1. **Analysis Workflow Pipeline (`run_group_analysis_pipeline`)**: Integrates directly with survey designs and `presentresults` to iteratively apply standard analysis across multiple group variables. It automatically generates output from all the analysis types listed in your LOA file.
 2. **Formatted Excel Exporting (`format_my_xlsx_variable_x_group`)**: Function to reshape and pivot the complex survey analysis outputs into a presentation-ready Excel document.
+3. **Data Prep & Log Generation**: A suite of tools built to parse standard data streams (`read_raw_data`, `read_loop_data`) by dynamically applying correct typecasting using your Kobo tool, and extracting, merging, and exporting "other" text responses into a structured Excel recode file (`save_other_responses`).
 
-> **Note:** `extrar` builds on top of the [`presentresults`](https://github.com/impact-initiatives/presentresults) package for label creation and results table formatting. Install this package first.
+> **Note:** `extrar` package builds on top of the following packages: [`cleaningtools`](https://github.com/impact-initiatives/cleaningtools), [`presentresults`](https://github.com/impact-initiatives/presentresults)
 
 ## Installation
 
 You can install the development version from GitHub with:
-
 ```r
 # install.packages("devtools")
 devtools::install_github("iAthman83/extraR")
 ```
 
-## Usage
+## Data Preparation & Cleaning
+
+`extrar` includes built-in functions designed to help you quickly pull raw data and configure your recode sheets before entering the main analysis pipeline. 
+
+### Safely Read and Standardize Data (`read_raw_data` & `read_loop_data`)
+Instead of manually mutating every single column, these tools read your data while using your original `kobo_survey` object to auto-detect integer, decimal, date, and datetime columns, fixing them instantly upon import:
+* **`read_raw_data`**: Standardizes the main dataset, ensures UUID columns are aligned, and optionally adds extra dates or times missing from the standard format.
+* **`read_loop_data`**: Pulls in roster sheets and generates a robust composite UUID (`[row_number]_[parent_uuid]`) to prevent primary key merging issues in loops.
+
+### Handling "Other" Responses (`save_other_responses`)
+Preparing text responses for cleaning log translations can be extremely tedious. The "other" responses suite connects all "other" text fields from both your main data and loop datasets into one centralized recode sheet:
+```r
+# 1. Map out which 'text' questions correspond to 'other' inputs 
+other_labels <- get_other_labels(kobo_survey)
+
+# 2. Match those specific choices with the dropdown elements from your Kobo tool 
+other_db <- get_other_db(kobo_survey, kobo_choices, other_labels)
+
+# 3. Pull all actual raw responses, merge them, and optionally attach extra metadata columns
+other_responses <- prepare_other_responses(
+  raw_data, 
+  other_db, 
+  kobo_choices, 
+  raw_loops = list(loop_data1, loop_data2), # Include loop data where necessary
+  extra_columns = c("enumerator_id", "governorate")
+)
+
+# 4. Generate a heavily formatted Excel workbook complete with column tracking, colors, and dynamic dropdown logic validations
+save_other_responses(other_responses, save_location = "output/", other_db = other_db)
+```
+
+## Data Analysis
 
 ### Step 1: Prepare the List of Analysis (LOA)
 
