@@ -10,7 +10,7 @@ It has three main components:
 2. **Formatted Excel Exporting (`format_my_xlsx_variable_x_group`)**: Function to reshape and pivot the complex survey analysis outputs into a presentation-ready Excel document.
 3. **Data Prep & Log Generation**: A suite of tools built to parse standard data streams (`read_raw_data`, `read_loop_data`) by dynamically applying correct typecasting using your Kobo tool, and extracting, merging, and exporting "other" text responses into a structured Excel recode file (`save_other_responses`).
 
-> **Note:** `extrar` builds on top of the following packages: [`cleaningtools`](https://github.com/impact-initiatives/cleaningtools), [`presentresults`](https://github.com/impact-initiatives/presentresults)
+> **Note:** `extrar` package builds on top of the following packages: [`cleaningtools`](https://github.com/impact-initiatives/cleaningtools), [`presentresults`](https://github.com/impact-initiatives/presentresults)
 
 ## Installation
 
