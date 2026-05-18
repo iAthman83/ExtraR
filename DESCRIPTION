@@ -22,7 +22,10 @@ Imports:
     rlang,
     crayon,
     readxl,
-    purrr
+    purrr,
+    httr,
+    jsonlite,
+    keyring
 Remotes: 
     impact-initiatives/cleaningtools,
     impact-initiatives/analysistools,
