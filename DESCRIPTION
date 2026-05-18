@@ -7,7 +7,6 @@ Description: Provides structured analysis pipelines and formatted output generat
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports: 
     cleaningtools,
     analysistools,
@@ -25,9 +24,11 @@ Imports:
     purrr,
     httr,
     jsonlite,
-    keyring
+    keyring,
+    zip
 Remotes: 
     impact-initiatives/cleaningtools,
     impact-initiatives/analysistools,
     impact-initiatives/presentresults,
     impact-initiatives/addindicators
+Config/roxygen2/version: 8.0.0
