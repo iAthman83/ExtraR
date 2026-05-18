@@ -39,7 +39,9 @@ kobo_export_trigger <- function(asset_id, server_url = "https://kobo.impact-init
     type = "xls",
     lang = "_xml",
     fields_from_all_versions = TRUE,
-    multiple_select = "both"
+    multiple_select = "both",
+    group_sep = "/",
+    hierarchy_in_labels = FALSE
   )
   
   req <- httr::POST(
