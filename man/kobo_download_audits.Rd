@@ -6,7 +6,7 @@
 \usage{
 kobo_download_audits(
   df,
-  uuid_column = "_uuid",
+  uuid_column = "uuid",
   audit_dir = "audits/",
   zip_output = TRUE
 )
