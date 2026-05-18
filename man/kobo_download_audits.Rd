@@ -5,16 +5,16 @@
 \title{Download Kobo Audit Files}
 \usage{
 kobo_download_audits(
-  df,
-  uuid_column = "uuid",
+  asset_id,
+  server_url = "https://kobo.impact-initiatives.org",
   audit_dir = "audits/",
   zip_output = TRUE
 )
 }
 \arguments{
-\item{df}{A dataframe of submissions (must contain \code{audit_URL} column).}
+\item{asset_id}{The Kobo asset ID.}
 
-\item{uuid_column}{The name of the UUID column in the dataframe (default: \code{"_uuid"}).}
+\item{server_url}{The Kobo server URL.}
 
 \item{audit_dir}{Directory to save the downloaded audit files.}
 
@@ -26,6 +26,7 @@ Invisibly returns the audit directory path.
 \description{
 Downloads audit log files for each submission from the Kobo server.
 Audit files track enumerator timing (how long each survey question took).
-Uses token-based authentication via \code{kobo_get_token()}.
+Fetches audit URLs directly from the Kobo JSON API, so it works
+regardless of how the main data was downloaded.
 Already-downloaded audits are skipped automatically.
 }
