@@ -185,38 +185,94 @@ kobo_download_data <- function(
 #'
 #' Downloads audit log files for each submission from the Kobo server.
 #' Audit files track enumerator timing (how long each survey question took).
-#' Uses token-based authentication via `kobo_get_token()`.
+#' Fetches audit URLs directly from the Kobo JSON API, so it works
+#' regardless of how the main data was downloaded.
 #' Already-downloaded audits are skipped automatically.
 #'
-#' @param df A dataframe of submissions (must contain `audit_URL` column).
-#' @param uuid_column The name of the UUID column in the dataframe (default: `"_uuid"`).
+#' @param asset_id The Kobo asset ID.
+#' @param server_url The Kobo server URL.
 #' @param audit_dir Directory to save the downloaded audit files.
 #' @param zip_output If TRUE, creates a zip file of all audit folders after downloading (default: TRUE).
 #' @return Invisibly returns the audit directory path.
 #' @export
 kobo_download_audits <- function(
-  df,
-  uuid_column = "uuid",
+  asset_id,
+  server_url = "https://kobo.impact-initiatives.org",
   audit_dir = "audits/",
   zip_output = TRUE
 ) {
   token <- kobo_get_token()
 
-  # Validate inputs
-  if (!uuid_column %in% names(df)) {
-    stop("Column '", uuid_column, "' not found in the dataframe.")
-  }
-  if (!"audit_URL" %in% names(df)) {
-    stop(
-      "Column 'audit_URL' not found in the dataframe. ",
-      "Make sure the Kobo form has audit logging enabled."
-    )
-  }
-
   # Ensure audit directory exists
   if (!dir.exists(audit_dir)) {
     dir.create(audit_dir, recursive = TRUE)
     cat(crayon::yellow(paste0("Created audit directory: ", audit_dir, "\n")))
+  }
+
+  # Fetch submission data from the JSON API (includes audit URLs)
+  cat(crayon::yellow("--> Fetching submission data from Kobo API...\n"))
+  data_url <- paste0(server_url, "/api/v2/assets/", asset_id, "/data.json")
+
+  all_results <- list()
+  next_url <- data_url
+
+  # Paginate through all results
+
+  while (!is.null(next_url)) {
+    req <- httr::GET(
+      next_url,
+      httr::add_headers(Authorization = paste("Token", token))
+    )
+
+    if (httr::status_code(req) != 200) {
+      stop(
+        "Failed to fetch submission data. Status code: ",
+        httr::status_code(req)
+      )
+    }
+
+    res <- httr::content(req, "parsed")
+    all_results <- c(all_results, res$results)
+    next_url <- res$`next`
+  }
+
+  cat(crayon::green(paste0(
+    "Found ", length(all_results), " submission(s).\n"
+  )))
+
+  if (length(all_results) == 0) {
+    cat(crayon::yellow("No submissions found.\n"))
+    return(invisible(audit_dir))
+  }
+
+  # Extract UUID and audit URL from each submission
+  audit_info <- lapply(all_results, function(submission) {
+    uuid <- submission$`_uuid`
+    attachments <- submission$`_attachments`
+    audit_url <- NULL
+
+    # Find the audit attachment
+    if (!is.null(attachments) && length(attachments) > 0) {
+      for (att in attachments) {
+        filename <- att$filename %||% ""
+        if (grepl("audit", filename, ignore.case = TRUE)) {
+          audit_url <- att$download_url %||% att$url
+          break
+        }
+      }
+    }
+
+    list(uuid = uuid, audit_url = audit_url)
+  })
+
+  # Filter to only submissions with audit URLs
+  audit_info <- Filter(function(x) !is.null(x$audit_url), audit_info)
+
+  if (length(audit_info) == 0) {
+    cat(crayon::yellow(
+      "No audit files found. Make sure audit logging is enabled in the Kobo form.\n"
+    ))
+    return(invisible(audit_dir))
   }
 
   # Skip UUIDs that are already downloaded
@@ -225,35 +281,30 @@ kobo_download_audits <- function(
     full.names = FALSE,
     recursive = FALSE
   )
-  df <- df[!df[[uuid_column]] %in% already_downloaded, ]
+  audit_info <- Filter(
+    function(x) !x$uuid %in% already_downloaded,
+    audit_info
+  )
 
-  # Filter out rows with missing audit URLs
-  df <- df[!is.na(df[["audit_URL"]]) & df[["audit_URL"]] != "", ]
-
-  if (nrow(df) == 0) {
+  if (length(audit_info) == 0) {
     cat(crayon::green("All audit files are already downloaded.\n"))
   } else {
     cat(crayon::yellow(paste0(
       "--> Downloading ",
-      nrow(df),
+      length(audit_info),
       " audit file(s)...\n"
     )))
 
     success_count <- 0
     fail_count <- 0
+    total <- length(audit_info)
 
-    for (i in seq_len(nrow(df))) {
-      uuid_i <- df[[uuid_column]][i]
-      url_i <- df[["audit_URL"]][i]
+    for (i in seq_along(audit_info)) {
+      uuid_i <- audit_info[[i]]$uuid
+      url_i <- audit_info[[i]]$audit_url
 
       cat(crayon::yellow(paste0(
-        "  [",
-        i,
-        "/",
-        nrow(df),
-        "] ",
-        uuid_i,
-        " ... "
+        "  [", i, "/", total, "] ", uuid_i, " ... "
       )))
 
       tryCatch(
@@ -272,7 +323,7 @@ kobo_download_audits <- function(
 
           audit_content <- httr::content(req, "text", encoding = "UTF-8")
 
-          # Validate that we got actual audit data (not an error message)
+          # Validate that we got actual audit data
           if (
             is.na(audit_content) ||
               audit_content == "" ||
