@@ -155,3 +155,130 @@ kobo_download_data <- function(asset_id, server_url = "https://kobo.impact-initi
     stop("Failed to download file. Status code: ", httr::status_code(req))
   }
 }
+
+#' Download Kobo Audit Files
+#'
+#' Downloads audit log files for each submission from the Kobo server.
+#' Audit files track enumerator timing (how long each survey question took).
+#' Uses token-based authentication via `kobo_get_token()`.
+#' Already-downloaded audits are skipped automatically.
+#'
+#' @param df A dataframe of submissions (must contain `audit_URL` column).
+#' @param uuid_column The name of the UUID column in the dataframe (default: `"_uuid"`).
+#' @param audit_dir Directory to save the downloaded audit files.
+#' @param zip_output If TRUE, creates a zip file of all audit folders after downloading (default: TRUE).
+#' @return Invisibly returns the audit directory path.
+#' @export
+kobo_download_audits <- function(df, uuid_column = "_uuid", audit_dir = "audits/", zip_output = TRUE) {
+  token <- kobo_get_token()
+
+  # Validate inputs
+  if (!uuid_column %in% names(df)) {
+    stop("Column '", uuid_column, "' not found in the dataframe.")
+  }
+  if (!"audit_URL" %in% names(df)) {
+    stop("Column 'audit_URL' not found in the dataframe. ",
+         "Make sure the Kobo form has audit logging enabled.")
+  }
+
+  # Ensure audit directory exists
+  if (!dir.exists(audit_dir)) {
+    dir.create(audit_dir, recursive = TRUE)
+    cat(crayon::yellow(paste0("Created audit directory: ", audit_dir, "\n")))
+  }
+
+  # Skip UUIDs that are already downloaded
+  already_downloaded <- list.dirs(audit_dir, full.names = FALSE, recursive = FALSE)
+  df <- df[!df[[uuid_column]] %in% already_downloaded, ]
+
+  # Filter out rows with missing audit URLs
+  df <- df[!is.na(df[["audit_URL"]]) & df[["audit_URL"]] != "", ]
+
+  if (nrow(df) == 0) {
+    cat(crayon::green("All audit files are already downloaded.\n"))
+  } else {
+    cat(crayon::yellow(paste0("--> Downloading ", nrow(df), " audit file(s)...\n")))
+
+    success_count <- 0
+    fail_count <- 0
+
+    for (i in seq_len(nrow(df))) {
+      uuid_i <- df[[uuid_column]][i]
+      url_i <- df[["audit_URL"]][i]
+
+      cat(crayon::yellow(paste0("  [", i, "/", nrow(df), "] ", uuid_i, " ... ")))
+
+      tryCatch({
+        req <- httr::GET(
+          url_i,
+          httr::add_headers(Authorization = paste("Token", token)),
+          httr::timeout(120)
+        )
+
+        if (httr::status_code(req) != 200) {
+          cat(crayon::red(paste0("HTTP ", httr::status_code(req), "\n")))
+          fail_count <- fail_count + 1
+          next
+        }
+
+        audit_content <- httr::content(req, "text", encoding = "UTF-8")
+
+        # Validate that we got actual audit data (not an error message)
+        if (is.na(audit_content) || audit_content == "" ||
+            grepl("Attachment not found", audit_content, fixed = TRUE)) {
+          cat(crayon::red("No audit data found.\n"))
+          fail_count <- fail_count + 1
+          next
+        }
+
+        # Save the audit file
+        uuid_dir <- file.path(audit_dir, uuid_i)
+        dir.create(uuid_dir, showWarnings = FALSE, recursive = TRUE)
+        audit_path <- file.path(uuid_dir, "audit.csv")
+
+        # Try to parse as proper CSV, otherwise save raw
+        parsed <- tryCatch({
+          utils::read.csv(text = audit_content, stringsAsFactors = FALSE)
+        }, error = function(e) NULL)
+
+        if (!is.null(parsed) && nrow(parsed) > 0) {
+          utils::write.csv(parsed, audit_path, row.names = FALSE)
+        } else {
+          writeLines(audit_content, audit_path)
+        }
+
+        cat(crayon::green("OK\n"))
+        success_count <- success_count + 1
+
+      }, error = function(e) {
+        cat(crayon::red(paste0("Error: ", e$message, "\n")))
+        fail_count <<- fail_count + 1
+      })
+    }
+
+    cat(crayon::green(paste0("\nDone! ", success_count, " downloaded")))
+    if (fail_count > 0) {
+      cat(crayon::red(paste0(", ", fail_count, " failed")))
+    }
+    cat("\n")
+  }
+
+  # Zip audit files if requested
+  if (zip_output) {
+    audit_folders <- list.dirs(audit_dir, full.names = TRUE, recursive = FALSE)
+    if (length(audit_folders) > 0) {
+      zip_path <- paste0(tools::file_path_sans_ext(sub("/$", "", audit_dir)), ".zip")
+      cat(crayon::yellow(paste0("--> Zipping audit files to: ", zip_path, "\n")))
+      zip::zip(
+        zipfile = zip_path,
+        files = audit_folders,
+        mode = "cherry-pick"
+      )
+      cat(crayon::green("Zip file created successfully.\n"))
+    } else {
+      cat(crayon::yellow("No audit folders found to zip.\n"))
+    }
+  }
+
+  return(invisible(audit_dir))
+}
