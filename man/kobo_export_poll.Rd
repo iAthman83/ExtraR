@@ -4,7 +4,7 @@
 \alias{kobo_export_poll}
 \title{Poll Kobo Export Status}
 \usage{
-kobo_export_poll(export_url, sleep_time = 5)
+kobo_export_poll(export_url, sleep_time = 5, max_retries = 60)
 }
 \arguments{
 \item{export_url}{The export URL returned by \code{kobo_export_trigger}}

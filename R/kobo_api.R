@@ -65,11 +65,17 @@ kobo_export_trigger <- function(asset_id, server_url = "https://kobo.impact-init
 #' @param sleep_time Seconds to wait between polling
 #' @return The download URL when successful
 #' @export
-kobo_export_poll <- function(export_url, sleep_time = 5) {
+kobo_export_poll <- function(export_url, sleep_time = 5, max_retries = 60) {
   token <- kobo_get_token()
   
   cat(crayon::yellow("Polling export status...\n"))
+  attempt <- 0
   repeat {
+    attempt <- attempt + 1
+    if (attempt > max_retries) {
+      stop("Export timed out after ", max_retries, " attempts.")
+    }
+    
     req <- httr::GET(
       export_url,
       httr::add_headers(Authorization = paste("Token", token))
@@ -77,18 +83,33 @@ kobo_export_poll <- function(export_url, sleep_time = 5) {
     
     if (httr::status_code(req) == 200) {
       res <- httr::content(req, "parsed")
-      status <- res$job_status
+      # Kobo API v2 uses 'status' (lowercase values: complete, error, processing, created)
+      status <- res$status %||% res$job_status
       
-      if (status == "SUCCESS") {
+      if (is.null(status)) {
+        # If neither field exists, dump the response keys for debugging
+        stop("Unexpected API response. Available fields: ",
+             paste(names(res), collapse = ", "))
+      }
+      
+      status <- tolower(status)
+      
+      if (status %in% c("complete", "success")) {
         cat(crayon::green("Export successful.\n"))
-        return(res$result)
-      } else if (status == "FAILED") {
+        download_url <- res$result
+        if (is.null(download_url)) {
+          stop("Export completed but no download URL found in response.")
+        }
+        return(download_url)
+      } else if (status %in% c("error", "failed")) {
         stop("Export failed on Kobo server.")
       }
       
+      cat(crayon::yellow("."))
       Sys.sleep(sleep_time)
     } else {
-      stop("Failed to poll export status. Status code: ", httr::status_code(req))
+      stop("Failed to poll export status. Status code: ", httr::status_code(req),
+           " Response: ", httr::content(req, "text"))
     }
   }
 }
