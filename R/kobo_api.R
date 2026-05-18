@@ -134,9 +134,8 @@ kobo_download_data <- function(asset_id, server_url = "https://kobo.impact-initi
   
   download_url <- kobo_export_poll(export_url)
   
-  # Ensure cache filename is unique per asset
-  timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-  filename <- paste0("kobo_data_", asset_id, "_", timestamp, ".xlsx")
+  # Ensure cache filename is unique per asset but overwrites old versions
+  filename <- paste0("kobo_data_", asset_id, ".xlsx")
   file_path <- file.path(cache_dir, filename)
   
   cat(crayon::green(paste0("--> Downloading data to: ", file_path, "\n")))

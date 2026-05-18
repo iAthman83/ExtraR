@@ -61,3 +61,61 @@ get_cols_numeric <- function(kobo_survey) {
     pull(name)
 }
 
+#' Load Required Packages for ExtraR
+#'
+#' This function installs (if necessary) and loads all packages required
+#' for the ExtraR package to run. It uses the `pak` package for efficient
+#' installation and dependency management.
+#'
+#' @export
+load_extrar_packages <- function() {
+  # List of core packages required
+  core_pkgs <- c(
+    "dplyr",
+    "stringr",
+    "tidyr",
+    "openxlsx",
+    "srvyr",
+    "uuid",
+    "rlang",
+    "crayon",
+    "readxl",
+    "purrr",
+    "httr",
+    "jsonlite",
+    "keyring",
+    "magrittr"
+  )
+  
+  # List of IMPACT specific packages from github
+  impact_pkgs <- c(
+    "impact-initiatives/cleaningtools",
+    "impact-initiatives/analysistools",
+    "impact-initiatives/presentresults",
+    "impact-initiatives/addindicators"
+  )
+  
+  # Install pak if not installed
+  if (!requireNamespace("pak", quietly = TRUE)) {
+    install.packages("pak")
+  }
+  
+  # Combine packages
+  all_pkgs_to_install <- c(core_pkgs, impact_pkgs)
+  
+  # Use pak to install any missing packages
+  cat(crayon::yellow("Checking and installing missing packages using 'pak'...\n"))
+  pak::pkg_install(all_pkgs_to_install)
+  
+  # Extract just the package names for loading
+  impact_pkg_names <- gsub(".*/", "", impact_pkgs)
+  all_pkg_names <- c(core_pkgs, impact_pkg_names)
+  
+  # Load all packages
+  cat(crayon::yellow("Loading required packages...\n"))
+  invisible(lapply(all_pkg_names, function(pkg) {
+    suppressPackageStartupMessages(library(pkg, character.only = TRUE))
+  }))
+  
+  cat(crayon::green("All required packages loaded successfully!\n"))
+}
