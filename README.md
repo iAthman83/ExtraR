@@ -8,7 +8,7 @@ It has three main components:
 
 1. **Analysis Workflow Pipeline (`run_group_analysis_pipeline`)**: Integrates directly with survey designs and `presentresults` to iteratively apply standard analysis across multiple group variables. It automatically generates output from all the analysis types listed in your LOA file.
 2. **Formatted Excel Exporting (`format_my_xlsx_variable_x_group`)**: Function to reshape and pivot the complex survey analysis outputs into a presentation-ready Excel document.
-3. **Data Prep & Log Generation**: A suite of tools built to parse standard data streams (`read_raw_data`, `read_loop_data`) by dynamically applying correct typecasting using your Kobo tool, and extracting, merging, and exporting "other" text responses into a structured Excel recode file (`save_other_responses`).
+3. **Data Prep & Log Generation**: A suite of tools built to parse standard data streams (`read_raw_data`, `read_loop_data`) by dynamically applying correct typecasting using your Kobo tool, and extracting, merging, and exporting "other" text responses into a structured Excel recode file (`save_other_responses`). This also includes a complete Kobo API integration to securely download raw datasets directly from the server.
 
 > **Note:** `extrar` package builds on top of the following packages: [`cleaningtools`](https://github.com/impact-initiatives/cleaningtools), [`presentresults`](https://github.com/impact-initiatives/presentresults)
 
@@ -24,8 +24,21 @@ devtools::install_github("iAthman83/extraR")
 
 `extrar` includes built-in functions designed to help you quickly pull raw data and configure your recode sheets before entering the main analysis pipeline. 
 
+### Securely Download Data from Kobo (`kobo_download_data`)
+The package includes a secure data acquisition layer to authenticate and download your survey data directly from KoboToolbox via its API.
+
+1. **Setup Token:** The first time you use this, securely store your API token in your system's credential store using the `keyring` package:
+   ```r
+   kobo_setup_token() # Prompts for token input
+   ```
+2. **Download Data:** Use `kobo_download_data` to trigger an export and download the `.xlsx` file to a `data/` folder automatically:
+   ```r
+   # Downloads the latest dataset for the specified asset ID
+   filepath <- kobo_download_data("your_kobo_asset_id_here")
+   ```
+
 ### Safely Read and Standardize Data (`read_raw_data` & `read_loop_data`)
-Instead of manually mutating every single column, these tools read your data while using your original `kobo_survey` object to auto-detect integer, decimal, date, and datetime columns, fixing them instantly upon import:
+Instead of manually mutating every single column, these tools read your data while using your original `kobo_survey` object to auto-detect integer, decimal, date, and datetime columns, fixing them instantly upon import. You can directly pass the `filepath` downloaded from the Kobo API above:
 * **`read_raw_data`**: Standardizes the main dataset, ensures UUID columns are aligned, and optionally adds extra dates or times missing from the standard format.
 * **`read_loop_data`**: Pulls in roster sheets and generates a robust composite UUID (`[row_number]_[parent_uuid]`) to prevent primary key merging issues in loops.
 
