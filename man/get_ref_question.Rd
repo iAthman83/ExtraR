@@ -5,15 +5,23 @@
 \title{Extract Referenced Question Name from Relevance Expression}
 \usage{
 get_ref_question(x)
+
+get_ref_question(x)
 }
 \arguments{
-\item{x}{A string containing a Kobo relevance expression.}
+\item{x}{A character vector containing Kobo relevance expressions.}
 }
 \value{
 The extracted question name, or \code{NA} if not found.
+
+A character vector of the extracted question names, or \code{NA} if not found.
 }
 \description{
 Parses a Kobo relevance expression string to extract the referenced
 question name enclosed in curly braces (e.g., \code{${question_name}}).
+
+Parses a Kobo relevance expression string to extract the referenced
+question name enclosed in curly braces (e.g., \code{${question_name}}).
+This function is fully vectorized.
 }
 \keyword{internal}
