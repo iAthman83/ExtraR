@@ -15,5 +15,5 @@ NULL. Updates the global variable \code{cleaning_log_other} in-place.
 \description{
 Logs the recoding of a \code{select_one} question's "other" response. Looks up the
 choice name from the selected label in the choices sheet, logs the removal of the
-text response and updates the parent selection.
+text response, and updates the parent selection.
 }
