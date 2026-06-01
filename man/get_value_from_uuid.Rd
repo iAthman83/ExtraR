@@ -4,23 +4,47 @@
 \alias{get_value_from_uuid}
 \title{Get Column Value by UUID}
 \usage{
-get_value_from_uuid(uuid, column, raw_data, raw_loop)
+get_value_from_uuid(
+  uuid,
+  column,
+  raw_data = NULL,
+  raw_roster = NULL,
+  raw_loop = NULL
+)
+
+get_value_from_uuid(
+  uuid,
+  column,
+  raw_data = NULL,
+  raw_roster = NULL,
+  raw_loop = NULL
+)
 }
 \arguments{
-\item{uuid}{The UUID to look up.}
+\item{uuid}{A character vector of UUIDs to look up.}
 
-\item{column}{The column name to retrieve the value from.}
+\item{column}{The column name (scalar character) to retrieve the value from.}
 
-\item{raw_data}{The main raw dataset dataframe.}
+\item{raw_data}{The main raw dataset dataframe. If \code{NULL}, looks for \code{raw_data} in the environment.}
 
-\item{raw_loop}{The loop/roster dataset dataframe.}
+\item{raw_roster}{Optional roster dataset dataframe. If \code{NULL}, looks for \code{raw_roster} or \code{raw_loop} in the environment.}
+
+\item{raw_loop}{Optional loop dataset dataframe. Synonym for \code{raw_roster}.}
 }
 \value{
 The value from the specified column for the matching UUID.
+
+A vector of values from the specified column for the matching UUIDs.
 }
 \description{
 Retrieves a value from a specific column for a given UUID. If the UUID
 contains an underscore (indicating a loop entry), it searches the loop
 dataset; otherwise it searches the main dataset.
+
+Retrieves a value from a specific column for a given UUID. If the UUID
+contains an underscore (indicating a loop/roster entry), it searches the loop
+dataset; otherwise it searches the main dataset. This function is fully vectorized,
+handles missing/empty values gracefully, and automatically looks up datasets
+in the environment if not explicitly provided.
 }
 \keyword{internal}
