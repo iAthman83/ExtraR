@@ -16,8 +16,8 @@ It has three main components:
 
 You can install the development version from GitHub with:
 ```r
-# install.packages("devtools")
-devtools::install_github("iAthman83/extraR")
+install.packages("pak")
+pak::pak("iAthman83/extraR")
 ```
 
 ## Data Preparation & Cleaning
