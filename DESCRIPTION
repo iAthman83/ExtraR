@@ -25,7 +25,8 @@ Imports:
     httr,
     jsonlite,
     keyring,
-    zip
+    zip,
+    pak
 Remotes: 
     impact-initiatives/cleaningtools,
     impact-initiatives/analysistools,
@@ -33,7 +34,6 @@ Remotes:
     impact-initiatives/addindicators
 Config/roxygen2/version: 8.0.0
 Suggests: 
-    testthat (>= 3.0.0),
-    pak
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 8.0.0
