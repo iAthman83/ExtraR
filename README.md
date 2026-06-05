@@ -1,7 +1,7 @@
 # extrar
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/iAthman83/ExtraR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/R-CMD-check.yaml)
+[![R-check](https://github.com/iAthman83/ExtraR/actions/workflows/R-check.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/R-check.yaml)
 <!-- [![test-coverage](https://github.com/iAthman83/ExtraR/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/test-coverage.yaml) -->
 <!--[![pkgdown](https://github.com/iAthman83/ExtraR/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/pkgdown.yaml) -->
 <!-- badges: end -->

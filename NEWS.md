@@ -5,7 +5,7 @@
 * Added unit testing framework using `testthat` (edition 3).
 * Enabled Markdown parsing in function documentation (`roxygen2`).
 * Configured permissive MIT License.
-* Added README badges for build status (`R-CMD-check`).
+* Added README badges for build status (`R-check.yaml`).
 
 ## Core Features
 
