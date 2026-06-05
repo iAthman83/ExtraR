@@ -1,5 +1,11 @@
 # extrar
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/iAthman83/ExtraR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/R-CMD-check.yaml)
+<!-- [![test-coverage](https://github.com/iAthman83/ExtraR/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/test-coverage.yaml) -->
+<!--[![pkgdown](https://github.com/iAthman83/ExtraR/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/pkgdown.yaml) -->
+<!-- badges: end -->
+
 ## Overview
 
 The `extrar` package provides powerful tools for standardizing dataset structures and preparing "other" text responses for recoding. It also takes the headache out of complex survey data analysis by automatically processing multiple grouping variables at once and seamlessly mapping metadata (like sectors and indicators) straight from your List of Analysis (LOA) into the final output.
