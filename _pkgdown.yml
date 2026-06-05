@@ -1,0 +1,13 @@
+url: https://iathman83.github.io/ExtraR/
+template:
+  bootstrap: 5
+
+home:
+  title: ExtraR
+
+navbar:
+  structure:
+    left:
+      - reference
+      - articles
+      - news
