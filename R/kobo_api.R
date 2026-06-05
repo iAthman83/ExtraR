@@ -74,6 +74,7 @@ kobo_export_trigger <- function(
 #'
 #' @param export_url The export URL returned by `kobo_export_trigger`
 #' @param sleep_time Seconds to wait between polling
+#' @param max_retries Maximum number of retries before timing out
 #' @return The download URL when successful
 #' @export
 kobo_export_poll <- function(export_url, sleep_time = 5, max_retries = 60) {

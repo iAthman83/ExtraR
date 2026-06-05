@@ -324,7 +324,7 @@ save_other_responses <- function(
             dataValidation(
               wb,
               "Sheet1",
-              col = c_idx,
+              cols = c_idx,
               rows = uuids + 1,
               type = "list",
               value = values
@@ -350,7 +350,7 @@ save_other_responses <- function(
     dataValidation(
       wb,
       "Sheet1",
-      col = invalid_col,
+      cols = invalid_col,
       rows = 2:(nrow(df) + 1),
       type = "list",
       value = values
