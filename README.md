@@ -2,6 +2,7 @@
 
 <!-- badges: start -->
 [![R-check](https://github.com/iAthman83/ExtraR/actions/workflows/R-check.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/R-check.yaml)
+[![lint](https://github.com/iAthman83/ExtraR/actions/workflows/lint.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/lint.yaml)
 <!-- [![test-coverage](https://github.com/iAthman83/ExtraR/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/test-coverage.yaml) -->
 <!--[![pkgdown](https://github.com/iAthman83/ExtraR/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/pkgdown.yaml) -->
 <!-- badges: end -->
