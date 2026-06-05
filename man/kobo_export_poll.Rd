@@ -10,6 +10,8 @@ kobo_export_poll(export_url, sleep_time = 5, max_retries = 60)
 \item{export_url}{The export URL returned by \code{kobo_export_trigger}}
 
 \item{sleep_time}{Seconds to wait between polling}
+
+\item{max_retries}{Maximum number of retries before timing out}
 }
 \value{
 The download URL when successful
