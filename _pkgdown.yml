@@ -11,3 +11,9 @@ navbar:
       - reference
       - articles
       - news
+
+articles:
+  - title: Guides
+    contents:
+      - data-cleaning
+      - data-analysis
