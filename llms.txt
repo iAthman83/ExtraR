@@ -93,9 +93,9 @@ pages:
 
 # Articles
 
-### Guides
+### All vignettes
 
-- [Data Preparation &
-  Cleaning](https://iathman83.github.io/ExtraR/articles/data-cleaning.md):
 - [Data
   Analysis](https://iathman83.github.io/ExtraR/articles/data-analysis.md):
+- [Data Preparation &
+  Cleaning](https://iathman83.github.io/ExtraR/articles/data-cleaning.md):
