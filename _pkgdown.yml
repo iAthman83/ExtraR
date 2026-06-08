@@ -9,11 +9,13 @@ navbar:
   structure:
     left:
       - reference
-      - articles
-      - news
-
-articles:
-  - title: Guides
-    contents:
       - data-cleaning
       - data-analysis
+      - news
+  components:
+    data-cleaning:
+      text: "Data Cleaning"
+      href: articles/data-cleaning.html
+    data-analysis:
+      text: "Data Analysis"
+      href: articles/data-analysis.html
