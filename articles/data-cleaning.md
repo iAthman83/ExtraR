@@ -1,0 +1,71 @@
+# Data Preparation & Cleaning
+
+The `extrar` package includes built-in functions designed to help you
+quickly pull raw data and configure your recode sheets before entering
+the main analysis pipeline.
+
+## Securely Download Data from Kobo (`kobo_download_data`)
+
+The package includes a secure data acquisition layer to authenticate and
+download your survey data directly from KoboToolbox via its API.
+
+1.  **Setup Token:** The first time you use this, securely store your
+    API token in your system’s credential store using the `keyring`
+    package:
+
+    ``` r
+
+    kobo_setup_token() # Prompts for token input
+    ```
+
+2.  **Download Data:** Use `kobo_download_data` to trigger an export and
+    download the `.xlsx` file to a `data/` folder automatically:
+
+    ``` r
+
+    # Downloads the latest dataset for the specified asset ID
+    filepath <- kobo_download_data("your_kobo_asset_id_here")
+    ```
+
+## Safely Read and Standardize Data (`read_raw_data` & `read_loop_data`)
+
+Instead of manually mutating every single column, these tools read your
+data while using your original `kobo_survey` object to auto-detect
+integer, decimal, date, and datetime columns, fixing them instantly upon
+import. You can directly pass the `filepath` downloaded from the Kobo
+API above:
+
+- **`read_raw_data`**: Standardizes the main dataset, ensures UUID
+  columns are aligned, and optionally adds extra dates or times missing
+  from the standard format.
+- **`read_loop_data`**: Pulls in roster sheets and generates a robust
+  composite UUID (`[row_number]_[parent_uuid]`) to prevent primary key
+  merging issues in loops.
+
+## Handling “Other” Responses (`save_other_responses`)
+
+Preparing text responses for cleaning log translations can be extremely
+tedious. The “other” responses suite connects all “other” text fields
+from both your main data and loop datasets into one centralized recode
+sheet:
+
+``` r
+
+# 1. Map out which 'text' questions correspond to 'other' inputs 
+other_labels <- get_other_labels(kobo_survey)
+
+# 2. Match those specific choices with the dropdown elements from your Kobo tool 
+other_db <- get_other_db(kobo_survey, kobo_choices, other_labels)
+
+# 3. Pull all actual raw responses, merge them, and optionally attach extra metadata columns
+other_responses <- prepare_other_responses(
+  raw_data, 
+  other_db, 
+  kobo_choices, 
+  raw_loops = list(loop_data1, loop_data2), # Include loop data where necessary
+  extra_columns = c("enumerator_id", "location")
+)
+
+# 4. Generate a heavily formatted Excel workbook complete with column tracking, colors, and dynamic dropdown logic validations
+save_other_responses(other_responses, save_location = "output/", other_db = other_db)
+```
