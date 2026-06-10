@@ -375,3 +375,54 @@ get_ref_question <- function(x) {
   if (is.null(x)) return(NA_character_)
   return(stringr::str_extract(as.character(x), "(?<=\\{)[^}]+"))
 }
+
+################################################################################
+
+#' Apply Kobo Labels
+#'
+#' Renames the analysis output options columns using a Kobo choices dictionary before a user can save the analysis.
+#'
+#' @param dataset The dataset to modify
+#' @param column_name The name of the column to relabel
+#' @param kobo_choices The choices dictionary from Kobo
+#' @return The updated dataset
+#' @export
+apply_kobo_labels <- function(dataset, column_name, kobo_choices) {
+  # 1. Check if the column actually exists in the dataset
+  if (!column_name %in% colnames(dataset)) {
+    stop(paste(
+      "Error: The column",
+      column_name,
+      "does not exist in the dataset."
+    ))
+  }
+
+  # 2. Create the dictionary from the choices sheet
+  label_lookup <- kobo_choices %>%
+    select(name, label) %>%
+    mutate(
+      name = as.character(name),
+      label = as.character(label)
+    ) %>%
+    filter(!is.na(name) & name != "") %>%
+    # Ensure there is only one entry per machine name globally
+    distinct(name, .keep_all = TRUE)
+
+  # Create a named vector: c("machine_name" = "Readable Label")
+  dict_vector <- setNames(label_lookup$label, label_lookup$name)
+
+  # 3. Apply the dictionary to the target column in the dataset
+  dataset_updated <- dataset %>%
+    mutate(
+      # Temporarily ensure the column is a character vector for safe matching
+      !!sym(column_name) := as.character(!!sym(column_name)),
+
+      # Replace names with labels. coalesce() keeps the original value if no match is found.
+      !!sym(column_name) := coalesce(
+        dict_vector[!!sym(column_name)],
+        !!sym(column_name)
+      )
+    )
+
+  return(dataset_updated)
+}
