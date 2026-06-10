@@ -8,7 +8,8 @@ Main function to download data from Kobo.
 kobo_download_data(
   asset_id,
   server_url = "https://kobo.impact-initiatives.org",
-  cache_dir = "data/"
+  cache_dir = "data/",
+  filename = paste0("kobo_data_", asset_id, ".xlsx")
 )
 ```
 
@@ -25,6 +26,11 @@ kobo_download_data(
 - cache_dir:
 
   Directory to save the downloaded file
+
+- filename:
+
+  The name of the downloaded file (default:
+  "kobo_data\_\<asset_id\>.xlsx")
 
 ## Value
 
