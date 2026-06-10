@@ -372,7 +372,9 @@ remove_choice <- function(concat_value, choice) {
 #' @return A character vector of the extracted question names, or \code{NA} if not found.
 #' @export
 get_ref_question <- function(x) {
-  if (is.null(x)) return(NA_character_)
+  if (is.null(x)) {
+    return(NA_character_)
+  }
   return(stringr::str_extract(as.character(x), "(?<=\\{)[^}]+"))
 }
 
