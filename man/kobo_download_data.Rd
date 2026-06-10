@@ -7,7 +7,8 @@
 kobo_download_data(
   asset_id,
   server_url = "https://kobo.impact-initiatives.org",
-  cache_dir = "data/"
+  cache_dir = "data/",
+  filename = paste0("kobo_data_", asset_id, ".xlsx")
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ kobo_download_data(
 \item{server_url}{The Kobo server URL (default: "https://kobo.impact-initiatives.org")}
 
 \item{cache_dir}{Directory to save the downloaded file}
+
+\item{filename}{The name of the downloaded file (default: "kobo_data_<asset_id>.xlsx")}
 }
 \value{
 The path to the downloaded Excel file

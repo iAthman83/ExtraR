@@ -139,12 +139,14 @@ kobo_export_poll <- function(export_url, sleep_time = 5, max_retries = 60) {
 #' @param asset_id The Kobo asset ID
 #' @param server_url The Kobo server URL (default: "https://kobo.impact-initiatives.org")
 #' @param cache_dir Directory to save the downloaded file
+#' @param filename The name of the downloaded file (default: "kobo_data_<asset_id>.xlsx")
 #' @return The path to the downloaded Excel file
 #' @export
 kobo_download_data <- function(
   asset_id,
   server_url = "https://kobo.impact-initiatives.org",
-  cache_dir = "data/"
+  cache_dir = "data/",
+  filename = paste0("kobo_data_", asset_id, ".xlsx")
 ) {
   # Ensure cache dir exists
   if (!dir.exists(cache_dir)) {
@@ -161,7 +163,6 @@ kobo_download_data <- function(
   download_url <- kobo_export_poll(export_url)
 
   # Ensure cache filename is unique per asset but overwrites old versions
-  filename <- paste0("kobo_data_", asset_id, ".xlsx")
   file_path <- file.path(cache_dir, filename)
 
   cat(crayon::green(paste0("--> Downloading data to: ", file_path, "\n")))
