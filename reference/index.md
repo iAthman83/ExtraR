@@ -12,6 +12,8 @@
   : Add Recoding of select_one Other Response to Cleaning Log
 - [`add_to_cleaning_log_other_remove()`](https://iathman83.github.io/ExtraR/reference/add_to_cleaning_log_other_remove.md)
   : Add Removal of Other Response to Cleaning Log
+- [`apply_kobo_labels()`](https://iathman83.github.io/ExtraR/reference/apply_kobo_labels.md)
+  : Apply Kobo Labels
 - [`check_constraints()`](https://iathman83.github.io/ExtraR/reference/check_constraints.md)
   : Check Kobo Survey Constraints
 - [`format_my_xlsx_variable_x_group()`](https://iathman83.github.io/ExtraR/reference/format_my_xlsx_variable_x_group.md)
