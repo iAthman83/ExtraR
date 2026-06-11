@@ -1,6 +1,6 @@
 # Changelog
 
-## extrar 2026.6.5
+## extrar 2026.7.0
 
 ### Infrastructure Updates
 
