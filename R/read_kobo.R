@@ -1,4 +1,4 @@
-#' Read Kobo Survey Sheet
+#' Read Kobo Survey Sheet.
 #'
 #' Reads and processes the survey sheet from a Kobo XLS form. Column names are
 #' lowercased, rows without a name are removed, and \code{q_type} and
@@ -21,7 +21,8 @@ read_kobo_survey <- function(filepath, sheet_name = "survey") {
       q_type = as.character(lapply(type, function(x) {
         str_split(x, " ")[[1]][1]
       })),
-      choices_list_name = as.character(lapply(type, function(x) {
+      # split list name from type column
+      list_name = as.character(lapply(type, function(x) {
         str_split(x, " ")[[1]][2]
       }))
     )
@@ -34,7 +35,7 @@ read_kobo_survey <- function(filepath, sheet_name = "survey") {
   return(kobo_survey)
 }
 
-#' Read Kobo Choices Sheet
+#' Read Kobo Choices Sheet.
 #'
 #' Reads and processes the choices sheet from a Kobo XLS form. Column names
 #' are lowercased, rows without a \code{list_name} are removed, and

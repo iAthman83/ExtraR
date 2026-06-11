@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_kobo.R
 \name{read_kobo_choices}
 \alias{read_kobo_choices}
-\title{Read Kobo Choices Sheet}
+\title{Read Kobo Choices Sheet.}
 \usage{
 read_kobo_choices(filepath, sheet_name = "choices")
 }
