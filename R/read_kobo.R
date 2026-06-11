@@ -21,7 +21,7 @@ read_kobo_survey <- function(filepath, sheet_name = "survey") {
       q_type = as.character(lapply(type, function(x) {
         str_split(x, " ")[[1]][1]
       })),
-      list_name = as.character(lapply(type, function(x) {
+      choices_list_name = as.character(lapply(type, function(x) {
         str_split(x, " ")[[1]][2]
       }))
     )
