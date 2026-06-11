@@ -51,10 +51,10 @@ get_other_db <- function(kobo_survey, kobo_choices, other_labels) {
     ) %>%
     select(-relevant)
 
-  # remove all option_other from choices
+  # remove all of option_other from choices
   kobo_choices_sub <- filter(
     kobo_choices,
-    choices_list_name %in% other_db$choices_list_name
+    list_name %in% other_db$list_name
   )
 
   for (r in 1:nrow(other_db)) {
