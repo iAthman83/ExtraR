@@ -42,7 +42,7 @@ get_other_db <- function(kobo_survey, kobo_choices, other_labels) {
   # generate other_db
   other_db <- other_labels %>%
     left_join(
-      select(kobo_survey, name, q_type, list_name),
+      select(kobo_survey, name, q_type, choices_list_name),
       by = c("ref_question" = "name")
     ) %>%
     left_join(select(kobo_survey, name, relevant), by = "name") %>%
@@ -52,13 +52,13 @@ get_other_db <- function(kobo_survey, kobo_choices, other_labels) {
     select(-relevant)
 
   # remove all option_other from choices
-  kobo_choices_sub <- filter(kobo_choices, list_name %in% other_db$list_name)
+  kobo_choices_sub <- filter(kobo_choices, choices_list_name %in% other_db$choices_list_name)
 
   for (r in 1:nrow(other_db)) {
     if (!is.na(other_db$option_other[r])) {
       kobo_choices_sub <- kobo_choices_sub %>%
         filter(
-          !(list_name == other_db$list_name[r] &
+          !(choices_list_name == other_db$choices_list_name[r] &
             name == other_db$option_other[r])
         )
     }
@@ -66,10 +66,10 @@ get_other_db <- function(kobo_survey, kobo_choices, other_labels) {
   # add list of available choices
   other_db <- other_db %>%
     left_join(
-      select(kobo_choices_sub, list_name, label = "label") %>%
-        group_by(list_name) %>%
+      select(kobo_choices_sub, choices_list_name, label = "label") %>%
+        group_by(choices_list_name) %>%
         summarise(num_choices = n(), choices = paste0(label, collapse = ";;")),
-      by = "list_name"
+      by = "choices_list_name"
     )
 
   return(other_db)
