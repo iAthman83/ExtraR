@@ -1,4 +1,4 @@
-# Read Kobo Choices Sheet
+# Read Kobo Choices Sheet.
 
 Reads and processes the choices sheet from a Kobo XLS form. Column names
 are lowercased, rows without a `list_name` are removed, and duplicate

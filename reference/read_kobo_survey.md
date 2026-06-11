@@ -1,4 +1,4 @@
-# Read Kobo Survey Sheet
+# Read Kobo Survey Sheet.
 
 Reads and processes the survey sheet from a Kobo XLS form. Column names
 are lowercased, rows without a name are removed, and `q_type` and

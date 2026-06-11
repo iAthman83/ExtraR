@@ -47,9 +47,9 @@
 - [`prepare_other_responses()`](https://iathman83.github.io/ExtraR/reference/prepare_other_responses.md)
   : Prepare Other Responses Dataframe
 - [`read_kobo_choices()`](https://iathman83.github.io/ExtraR/reference/read_kobo_choices.md)
-  : Read Kobo Choices Sheet
+  : Read Kobo Choices Sheet.
 - [`read_kobo_survey()`](https://iathman83.github.io/ExtraR/reference/read_kobo_survey.md)
-  : Read Kobo Survey Sheet
+  : Read Kobo Survey Sheet.
 - [`read_loop_data()`](https://iathman83.github.io/ExtraR/reference/read_loop_data.md)
   : Read Loop/Roster Dataset
 - [`read_raw_data()`](https://iathman83.github.io/ExtraR/reference/read_raw_data.md)
