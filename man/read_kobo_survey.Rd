@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_kobo.R
 \name{read_kobo_survey}
 \alias{read_kobo_survey}
-\title{Read Kobo Survey Sheet}
+\title{Read Kobo Survey Sheet.}
 \usage{
 read_kobo_survey(filepath, sheet_name = "survey")
 }
