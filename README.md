@@ -1,11 +1,8 @@
-# extrar
+# extrar <img src="man/figures/logo.svg" align="right" height="139" alt="extrar website logo" />
 
 <!-- badges: start -->
 [![R-check](https://github.com/iAthman83/ExtraR/actions/workflows/R-check.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/R-check.yaml)
 [![lint](https://github.com/iAthman83/ExtraR/actions/workflows/lint.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/lint.yaml)
-<!-- [![test-coverage](https://github.com/iAthman83/ExtraR/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/test-coverage.yaml) -->
-<!--[![pkgdown](https://github.com/iAthman83/ExtraR/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/iAthman83/ExtraR/actions/workflows/pkgdown.yaml) -->
-<!-- badges: end -->
 
 The `extrar` package provides powerful tools for standardizing dataset structures, preparing "other" text responses for recoding, and performing complex survey data analysis.
 
