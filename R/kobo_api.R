@@ -1,10 +1,16 @@
 #' Set Kobo API Token
 #'
-#' Interactively securely saves the Kobo API token using keyring.
+#' Securely saves the Kobo API token using keyring. If a token is not provided,
+#' the user will be prompted to enter it interactively.
+#'
+#' @param token Character. The Kobo API token. If NULL (default), the function
+#'   prompts for the token interactively.
 #' @export
-kobo_setup_token <- function() {
-  token <- readline(prompt = "Enter your Kobo API token: ")
-  if (token != "") {
+kobo_setup_token <- function(token = NULL) {
+  if (is.null(token)) {
+    token <- readline(prompt = "Enter your Kobo API token: ")
+  }
+  if (!is.null(token) && token != "") {
     keyring::key_set_with_value("kobo_api_token", password = token)
     cat(crayon::green("Token successfully saved.\n"))
   } else {

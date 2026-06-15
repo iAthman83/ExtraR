@@ -4,8 +4,13 @@
 \alias{kobo_setup_token}
 \title{Set Kobo API Token}
 \usage{
-kobo_setup_token()
+kobo_setup_token(token = NULL)
+}
+\arguments{
+\item{token}{Character. The Kobo API token. If NULL (default), the function
+prompts for the token interactively.}
 }
 \description{
-Interactively securely saves the Kobo API token using keyring.
+Securely saves the Kobo API token using keyring. If a token is not provided,
+the user will be prompted to enter it interactively.
 }
