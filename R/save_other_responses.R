@@ -337,7 +337,13 @@ save_other_responses <- function(
     r <- 0
   }
 
-  writeData(wb, sheet = "Dropdown_values", x = c("Yes"), startCol = r + 1)
+  writeData(
+    wb,
+    sheet = "Dropdown_values",
+    x = c("Yes"),
+    startCol = r + 1,
+    colNames = FALSE
+  )
   column_letter <- get_column_letter(r + 1)
   values <- paste0(
     "'Dropdown_values'!$",
