@@ -313,7 +313,7 @@ save_other_responses <- function(
         if (length(uuids) > 0 && length(exist_cols) > 0) {
           column_letter <- get_column_letter(r)
           values <- paste0(
-            "'Dropdown_values'!$",
+            "='Dropdown_values'!$",
             column_letter,
             "$1:$",
             column_letter,
@@ -346,7 +346,7 @@ save_other_responses <- function(
   )
   column_letter <- get_column_letter(r + 1)
   values <- paste0(
-    "'Dropdown_values'!$",
+    "='Dropdown_values'!$",
     column_letter,
     "$1:$",
     column_letter,
