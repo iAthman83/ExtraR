@@ -175,15 +175,22 @@ save_other_responses <- function(
   other_db = NULL
 ) {
   get_column_letter <- function(r) {
-    return(ifelse(
-      r <= 26,
-      LETTERS[r],
-      ifelse(
-        r <= 52,
-        paste0(LETTERS[1], LETTERS[r - 26]),
-        paste0(LETTERS[2], LETTERS[r - 52])
-      )
-    ))
+    result <- character(length(r))
+
+    for (i in seq_along(r)) {
+      n <- r[i]
+      col <- ""
+
+      while (n > 0) {
+        remainder <- (n - 1) %% 26
+        col <- paste0(LETTERS[remainder + 1], col)
+        n <- (n - 1) %/% 26
+      }
+
+      result[i] <- col
+    }
+
+    result
   }
 
   # save other responses
